@@ -1,0 +1,30 @@
+# Build files
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+
+# CMake / Make
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/
+*.swp
+*.swo
+*.user
+*.sln
+*.vcxproj*
