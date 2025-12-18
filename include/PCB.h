@@ -1,0 +1,99 @@
+#pragma once
+#include <ostream>
+
+constexpr int TIME_QUANTUM = 4;
+
+enum class ProcessState
+{
+    READY = 0,
+    RUNNING = 1,
+    WAITING_IO = 2,
+    FINISHED = 3
+};
+
+class PCB
+{
+    friend std::ostream &operator<<(std::ostream &out, const PCB &p);
+
+public:
+    PCB(int pid, int prio, int burst, bool io_bound, int io_interval);
+
+    bool execute(int timeslice);
+    bool ageProcess(int timediff);
+
+    // Getters
+    int getPid() const;
+    int getPriority() const;
+    int getBurstTime() const;
+    int getCpuUsed() const;
+    int getIOInterval() const;
+    int getRemainingTime() const;
+    int getIORemainingTime() const;
+    int getWaitingTime() const;
+    bool isIOBound() const;
+    // bool isWaitingIO() const;
+    ProcessState getState() const;
+    std::string getStringState() const;
+
+    // Setters
+    void setState(ProcessState state);
+    void setPriority(int prio);
+    void setIOTime(int io_remainingtime);
+    void resetIO();
+    void startIO();
+
+    // Boolean helpers for state
+    bool isReady() const;
+    bool isRunning() const;
+    bool isWaitingIO() const;
+    bool isFinished() const;
+
+private:
+    int pid;           // process id
+    int prio;          // current priority
+    int old_prio;      // original prio
+    int bursttime;     // burst time
+    int remainingtime; // remaining time after burst
+    int waiting_time;  // time a process has waited to be executed
+    bool io_bound;     // true if process is I/O bound
+    int io_interval;   // how often in ms it performs I/O
+    int io_remaining;  // how long left of io operation
+    int cpu_used;      // cumulative CPU time used since last I/O
+    // bool waiting_io;   // true if currently blocked
+    ProcessState PS; // Process State
+};
+
+/*
+just to store the old process
+// Process info
+    struct Process
+    {
+        int pid;           // process id
+        int prio;          // current priority
+        int old_prio;      // original prio
+        int bursttime;     // burst time
+        int remainingtime; // remaining time after burst
+        int waiting_time;  // time a process has waited to be executed
+        bool io_bound;     // true if process is I/O bound
+        int io_interval;   // how often in ms it performs I/O
+        int io_remaining;  // how long left of io operation
+        int cpu_used;      // cumulative CPU time used since last I/O
+        bool waiting_io;   // true if currently blocked
+
+        friend std::ostream &operator<<(std::ostream &out, const Process &p)
+        {
+            out << "{PID:" << p.pid
+                << ", Prio:" << p.prio
+                << ", Burst:" << p.bursttime
+                << ", Remain:" << p.remainingtime
+                << ", Waited: " << p.waiting_time
+                << ", io bound: " << std::boolalpha << p.io_bound
+                << ", io interval: " << p.io_interval
+                << ", cpu used: " << p.cpu_used
+                << ", waiting io: " << std::boolalpha << p.waiting_io
+                << "}";
+            return out;
+        }
+    };
+
+*/
