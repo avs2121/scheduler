@@ -8,6 +8,7 @@
 #include <chrono>
 #include <deque>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -44,20 +45,20 @@ public:
   void findAvgTime();
 
   // Execute + Aging  -> PCB Handles this
-  bool executeProcess(Process &p, int &currentTime);
-  bool ageProcess(Process &proc, int time_diff);
+  // bool executeProcess(Process &p, int &currentTime);
+  // bool ageProcess(Process &proc, int time_diff);
 
   // This is in between IO Manager + PCB, handle moving process to/from
   // scheduler and IO manager
-  void updateQueuesAfterAging(Process &p, int &time_diff);
+  void updateQueuesAfterAging(std::unique_ptr<PCB> &p, int &time_slice);
 
   // IO Handling -> IOManager handles this.
-  void updateIO(Process &p);
-  void processIO(int &time_diff, int &currentTime);
-  void handleIOqueue(std::vector<size_t> temp_io, int &currentTime);
+  // void updateIO(Process &p);
+  // void processIO(int &time_diff, int &currentTime);
+  // void handleIOqueue(std::vector<size_t> temp_io, int &currentTime);
 
   // Logging
-  void logEvent(Process &p);
+  void logEvent(std::unique_ptr<PCB> &p);
   void flushLogs();
 
   // Scheduling + Queues setup.
@@ -97,19 +98,20 @@ private:
 
   std::mutex schedule_lock;
 
-  // const vector, but mutable objects via pointers.
-  const std::array<std::unique_ptr<PCB>, N> Processes = {
-      std::make_unique<PCB>(1, 2, 10, 1, 5),
-      std::make_unique<PCB>(2, 3, 8, 0, 0),
-      std::make_unique<PCB>(3, 1, 22, 1, 9),
-      std::make_unique<PCB>(4, 2, 12, 0, 0),
-      std::make_unique<PCB>(5, 3, 19, 0, 0),
-      std::make_unique<PCB>(6, 1, 5, 0, 0),
+  // clang-format off
+  std::array<PCB, N> process_pool = {
+      PCB(1, 2, 10, 1, 5),
+      PCB(2, 3, 8, 0, 0),
+      PCB(3, 1, 22, 1, 9),
+      PCB(4, 2, 12, 0, 0),
+      PCB(5, 3, 19, 0, 0),
+      PCB(6, 1, 5, 0, 0),
   };
+  // clang-format on
 
   std::vector<int> wait_time;
   std::array<ReadyQueue<size_t, N * 2>, MAX_PRIORITY + 1> readyQueue;
-  std::deque<size_t> io_waitQueue;
+  IOManager IO_Processes;
 
   int time_pid;
   int total_wait_time;

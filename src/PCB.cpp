@@ -62,6 +62,8 @@ int PCB::getPid() const { return pid; }
 
 int PCB::getPriority() const { return prio; }
 
+int PCB::getOldPriority() const { return old_prio; }
+
 int PCB::getBurstTime() const { return bursttime; }
 
 int PCB::getCpuUsed() const { return cpu_used; }

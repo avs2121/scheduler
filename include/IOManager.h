@@ -1,34 +1,31 @@
 #pragma once
 #include "PCB.h"
 #include <deque>
-#include <memory>
 #include <vector>
 
 class IOManager {
 public:
-  IOManager() = default;
+  IOManager(std::array<PCB, N> &process_pool);
 
-  void enqueue(std::unique_ptr<PCB> p);
+  void enqueue(size_t idx);
   void updateIO();
   void processIO(int timeslice);
   void handleIOqueue();
-  const std::vector<std::unique_ptr<PCB>> &getFinishedProcesses() const;
+  const std::vector<size_t> &getFinishedProcesses() const;
+  const std::deque<size_t> &getQueue() const;
 
   // Query methods
   bool isEmpty() const;
   size_t size() const;
-  bool contains(const PCB *p) const;
   bool containsPID(int pid) const;
 
   // Utility methods
   void clear();
   int getMinRemainingIOTime() const;
-
-  // Debug funcs
-  const std::deque<std::unique_ptr<PCB>> &getQueue() const;
   void printQueue() const;
 
 private:
-  std::deque<std::unique_ptr<PCB>> IO_queue;
-  std::vector<std::unique_ptr<PCB>> finished_IO;
+  std::array<PCB, N> &process_pool;
+  std::deque<size_t> IO_queue;
+  std::vector<size_t> finished_IO;
 };

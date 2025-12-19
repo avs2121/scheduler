@@ -1,22 +1,24 @@
 #include "IOManager.h"
 #include <algorithm>
+#include <array>
 #include <climits>
 #include <iostream>
 
-void IOManager::enqueue(std::unique_ptr<PCB> p) {
-  if (p)
-    IO_queue.push_back(std::move(p));
-}
+IOManager::IOManager(std::array<PCB, N> &process_pool)
+    : process_pool(process_pool) {}
+
+void IOManager::enqueue(size_t idx) { IO_queue.push_back(idx); }
 
 void IOManager::updateIO() {
 
   if (IO_queue.empty())
     return;
 
-  for (auto &pcb_ptr : IO_queue) {
-    if (pcb_ptr->isWaitingIO() && pcb_ptr->isIOBound() &&
-        pcb_ptr->getRemainingTime() > 0) {
-      pcb_ptr->startIO();
+  for (size_t idx : IO_queue) {
+    PCB &proc = process_pool[idx];
+
+    if (proc.isWaitingIO() && proc.isIOBound() && proc.getRemainingTime() > 0) {
+      proc.startIO();
     }
   }
 }
@@ -28,14 +30,14 @@ void IOManager::processIO(int timeslice) {
 
   int time_diff = std::max(0, timeslice); // secure time_diff is positive.
 
-  for (auto &pcb_ptr : IO_queue) {
-    if (pcb_ptr->getIORemainingTime() > 0) {
-      pcb_ptr->setIOTime(
-          std::max(0, pcb_ptr->getIORemainingTime() - time_diff));
+  for (size_t idx : IO_queue) {
+    PCB &proc = process_pool[idx];
+    if (proc.getIORemainingTime() > 0) {
+      proc.setIOTime(std::max(0, proc.getIORemainingTime() - time_diff));
     }
 
-    if (pcb_ptr->getIORemainingTime() <= 0) {
-      finished_IO.push_back(std::move(pcb_ptr));
+    if (proc.getIORemainingTime() <= 0) {
+      finished_IO.push_back(idx);
     }
   }
 
@@ -47,20 +49,20 @@ void IOManager::handleIOqueue() {
   if (IO_queue.empty())
     return;
 
-  for (auto &pcb_ptr : finished_IO) {
-    pcb_ptr->resetIO();
+  for (size_t idx : finished_IO) {
+    PCB &proc = process_pool[idx];
+    proc.resetIO();
   }
 
   // remove all finished process, by detecting waiting_IO flag.
   IO_queue.erase(std::remove_if(IO_queue.begin(), IO_queue.end(),
-                                [](std::unique_ptr<PCB> &pcb_ptr) {
-                                  return !(pcb_ptr->isWaitingIO());
+                                [&](size_t idx) {
+                                  return !(process_pool[idx].isWaitingIO());
                                 }),
                  IO_queue.end());
 }
 
-const std::vector<std::unique_ptr<PCB>> &
-IOManager::getFinishedProcesses() const {
+const std::vector<size_t> &IOManager::getFinishedProcesses() const {
   return finished_IO;
 }
 
@@ -68,22 +70,11 @@ bool IOManager::isEmpty() const { return IO_queue.empty(); }
 
 size_t IOManager::size() const { return IO_queue.size(); }
 
-bool IOManager::contains(const PCB *p) const {
-  if (!p) {
-    return false;
-  }
-  return (std::any_of(
-      IO_queue.begin(), IO_queue.end(),
-      [p](const std::unique_ptr<PCB> &pcb_ptr) { return p == pcb_ptr.get(); }));
-}
-
 bool IOManager::containsPID(int pid) const {
-  for (const auto &process : IO_queue) {
-    if (process->getPid() == pid) {
-      return true;
-    }
-  }
-  return false;
+  return (
+      std::any_of(IO_queue.begin(), IO_queue.end(), [pid, this](size_t idx) {
+        return pid == process_pool[idx].getPid();
+      }));
 }
 
 void IOManager::clear() {
@@ -93,18 +84,17 @@ void IOManager::clear() {
 
 int IOManager::getMinRemainingIOTime() const {
   int min = INT_MAX;
-  for (const auto &p : IO_queue) {
-    if (p->getIORemainingTime() < min) {
-      min = p->getIORemainingTime();
+  for (size_t idx : IO_queue) {
+    PCB &proc = process_pool[idx];
+    if (proc.getIORemainingTime() < min) {
+      min = proc.getIORemainingTime();
     }
   }
 
   return min;
 };
 
-const std::deque<std::unique_ptr<PCB>> &IOManager::getQueue() const {
-  return IO_queue;
-}
+const std::deque<size_t> &IOManager::getQueue() const { return IO_queue; }
 
 void IOManager::printQueue() const {
   for (const auto &p : IO_queue) {

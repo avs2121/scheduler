@@ -2,6 +2,7 @@
 #include <ostream>
 
 constexpr int TIME_QUANTUM = 4;
+constexpr int N = 6;
 
 enum class ProcessState {
   READY = 0,
@@ -22,6 +23,7 @@ public:
   // Getters
   int getPid() const;
   int getPriority() const;
+  int getOldPriority() const;
   int getBurstTime() const;
   int getCpuUsed() const;
   int getIOInterval() const;
