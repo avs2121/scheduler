@@ -232,6 +232,8 @@ void Scheduler::flushLogs() {
 }
 
 bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
+  std::cerr << "in clean up queues" << std::endl;
+
   bool hasRemainingWork = false;
   for (const auto &proc : process_pool) {
     if (proc.getRemainingTime() > 0) {
@@ -315,7 +317,7 @@ bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
 
 void Scheduler::roundRobin() {
   std::unique_lock<std::mutex> lk(schedule_lock);
-
+  std::cerr << "in round robin" << std::endl;
   for (size_t p = 0; p < process_pool.size(); p++) {
     if (process_pool[p].getPriority() < 0 ||
         process_pool[p].getPriority() > MAX_PRIORITY) // use clamp!
@@ -326,6 +328,7 @@ void Scheduler::roundRobin() {
     }
     readyQueue[process_pool[p].getPriority()].push(p);
   }
+  std::cerr << "in round robin after setting up readyqueue" << std::endl;
 
   int currentTime = 0; // track current time
   int lastTime = 0;
@@ -334,9 +337,12 @@ void Scheduler::roundRobin() {
     if (!cleanUpQueues(currentTime, lastTime)) {
       break;
     }
+    std::cerr << "in while true loop after clean up queues round robin"
+              << std::endl;
 
     // Execute process
     for (auto el = 1; el <= MAX_PRIORITY; ++el) {
+      std::cerr << readyQueue.size() << std::endl;
       if (!readyQueue[el].empty()) {
 
         debug(QUEUE, [&]() {
@@ -359,22 +365,33 @@ void Scheduler::roundRobin() {
 
         //***** Execute process *****//
 
+        std::cerr << "in before execute process in round robin" << std::endl;
+
         bool shouldRequeue = p.execute(currentTime);
         if (shouldRequeue && p.getRemainingTime() > 0 && !p.isWaitingIO())
           readyQueue[el].push(i);
 
         //***** Update aging *****//
+
+        std::cerr << "in before update aging round robin" << std::endl;
+
         int delta = std::min(currentTime - lastTime, TIME_QUANTUM);
         updateQueuesAfterAging(&p, delta);
 
         //***** Update IO Wait Queue here! *****//
+        std::cerr << "in before update io round robin" << std::endl;
+
         IO_Processes.updateIO();
 
         //***** IO Wait Queue management! *****//
+        std::cerr << "in before process io round robin" << std::endl;
+
         IO_Processes.processIO(delta);
 
         lastTime = currentTime;
         //***** Update logs *****//
+        std::cerr << "in before logevent round robin" << std::endl;
+
         logEvent(&p);
         break;
       }

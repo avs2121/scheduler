@@ -1,11 +1,9 @@
 #pragma once
-#include <algorithm>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
-
 
 class TestFixture {
 public:
