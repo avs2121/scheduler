@@ -1,4 +1,5 @@
 #include "PCB.h"
+#include <algorithm>
 
 PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval)
     : pid(pid), prio(prio), bursttime(burst), io_bound(io_bound),

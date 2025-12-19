@@ -15,7 +15,6 @@
 #include <vector>
 
 constexpr int MAX_PRIORITY = 3;
-constexpr int N = 6;
 
 class Scheduler {
 public:
