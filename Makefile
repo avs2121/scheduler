@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -g -Wall -O2 -std=c++20
+CXXFLAGS = -g -std=c++20 -Wall -Iinclude
 
 SRC_PATH = src
 INC_PATH = include
