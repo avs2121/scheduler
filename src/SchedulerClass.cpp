@@ -1,11 +1,12 @@
 #include "SchedulerClass.h"
+#include "IOManager.h"
 #include "LogsJson.h"
 #include "PCB.h"
-#include <climits>
-#include <memory>
 #include <sstream>
+#include <thread>
 
-Scheduler::Scheduler(std::string logs_name) : logs_name(logs_name) {
+Scheduler::Scheduler(std::string logs_name)
+    : IO_Processes(process_pool), logs_name(logs_name) {
   wait_time.resize(N, 0);
   time_pid = 0;
   total_wait_time = 0;
@@ -27,15 +28,15 @@ void Scheduler::findAvgTime() {
 void Scheduler::priorityScheduling() {
   std::unique_lock<std::mutex> lk(schedule_lock);
   std::sort(process_pool.begin(), process_pool.end(),
-            [](const std::unique_ptr<PCB> &a, const std::unique_ptr<PCB> &b) {
-              return a->getPriority() < b->getPriority();
+            [](const PCB &a, const PCB &b) {
+              return a.getPriority() < b.getPriority();
             });
 
   debug(EXEC, "Process order");
-  for (const auto &e : process_pool) {
-    debug(EXEC, "PID: " + std::to_string(e->getPid()) +
-                    ", burst time: " + std::to_string(e->getBurstTime()) +
-                    ", priority: " + std::to_string(e->getPriority()));
+  for (const auto &proc : process_pool) {
+    debug(EXEC, "PID: " + std::to_string(proc.getPid()) +
+                    ", burst time: " + std::to_string(proc.getBurstTime()) +
+                    ", priority: " + std::to_string(proc.getPriority()));
   }
 }
 
@@ -180,29 +181,28 @@ void Scheduler::handleIOqueue(std::vector<size_t> temp_io, int &currentTime) {
 }
 */
 
-void Scheduler::updateQueuesAfterAging(std::unique_ptr<PCB> &p,
-                                       int &time_slice) {
+void Scheduler::updateQueuesAfterAging(PCB *p, int &time_slice) {
   //***** Update aging *****//
   // phase 1 - find aged processes, and store them in vector
   std::vector<size_t> aged_processes;
   for (size_t idx = 0; idx < process_pool.size(); idx++) {
-    if (process_pool[idx]->getRemainingTime() > 0 &&
-        process_pool[idx]->getPid() != p->getPid() &&
-        !process_pool[idx]->isWaitingIO() &&
-        readyQueue[process_pool[idx]->getPriority()].contains(idx)) {
-      if (process_pool[idx]->ageProcess(time_slice)) {
+    if (process_pool[idx].getRemainingTime() > 0 &&
+        process_pool[idx].getPid() != p->getPid() &&
+        !process_pool[idx].isWaitingIO() &&
+        readyQueue[process_pool[idx].getPriority()].contains(idx)) {
+      if (process_pool[idx].ageProcess(time_slice)) {
         aged_processes.push_back(idx);
       }
     }
   }
   // phase 2 - remove and push the aged processes, to appropriate queues.
   for (auto id : aged_processes) {
-    readyQueue[process_pool[id]->getOldPriority()].remove(id);
-    readyQueue[process_pool[id]->getPriority()].push(id);
+    readyQueue[process_pool[id].getOldPriority()].remove(id);
+    readyQueue[process_pool[id].getPriority()].push(id);
   }
 }
 
-void Scheduler::logEvent(std::unique_ptr<PCB> &p) {
+void Scheduler::logEvent(PCB *p) {
   enum class Event { RUNNING, IO_WAIT, FINISHED };
 
   Event event = Event::RUNNING;
@@ -234,14 +234,14 @@ void Scheduler::flushLogs() {
 bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
   bool hasRemainingWork = false;
   for (const auto &proc : process_pool) {
-    if (proc->getRemainingTime() > 0) {
+    if (proc.getRemainingTime() > 0) {
       hasRemainingWork = true;
       break;
     }
   }
 
   // If this condition is met, all processes done.
-  if (!hasRemainingWork && IO_Processes->isEmpty()) {
+  if (!hasRemainingWork && IO_Processes.isEmpty()) {
     lastTime = currentTime;
     return false;
   }
@@ -256,67 +256,52 @@ bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
   }
 
   // If all processes are in IO wait, advance time
-  if (!anyQueueHasWork && !IO_Processes->isEmpty()) {
+  if (!anyQueueHasWork && !IO_Processes.isEmpty()) {
     // Find minimum IO remaining time
-    int minTime = IO_Processes->getMinRemainingIOTime();
+    int minTime = IO_Processes.getMinRemainingIOTime();
 
     debug(QUEUE, "All processes in IO wait, advancing time by " +
                      std::to_string(minTime) + "ms");
     currentTime += minTime;
 
     // Process IO completions
-    std::vector<std::unique_ptr<PCB>> temp_ready; // hold finished I/O process
+    std::vector<size_t> temp_ready; // hold finished I/O process
 
-    for (auto &pcb_ptr : IO_Processes->getQueue()) {
-      pcb_ptr->setIOTime(pcb_ptr->getIORemainingTime() - minTime);
-      if (pcb_ptr->getIORemainingTime() <= 0) {
-        temp_ready.push_back(std::move(pcb_ptr));
-      }
-    }
-
-    std::vector<size_t> temp_io;
-    for (auto idx : io_waitQueue) {
-      auto &proc = processes[idx];
-
-      proc.io_remaining -= minTime;
-      if (proc.io_remaining <= 0) {
-        temp_io.push_back(idx);
+    for (size_t idx : IO_Processes.getQueue()) {
+      PCB &proc = process_pool[idx];
+      proc.setIOTime(proc.getIORemainingTime() - minTime);
+      if (proc.getIORemainingTime() <= 0) {
+        temp_ready.push_back(idx);
       }
     }
 
     // Reinsert completed IO processes
-    for (auto idx : temp_io) {
-      auto &done_proc = processes[idx];
+    for (auto idx : temp_ready) {
+      PCB &proc = process_pool[idx];
+      proc.setIOTime(0);
 
-      done_proc.waiting_io = false;
-      done_proc.cpu_used = 0;
-      done_proc.io_remaining = 0;
-      done_proc.waiting_time = 0;
-
-      if (done_proc.remainingtime > 0) {
-        debug(QUEUE, "[IO DONE] PID " + std::to_string(done_proc.pid) +
+      if (proc.getRemainingTime() > 0) {
+        debug(QUEUE, "[IO DONE] PID " + std::to_string(proc.getPid()) +
                          " resuming from IO at time " +
                          std::to_string(currentTime));
-        readyQueue[done_proc.prio].push(idx);
+        readyQueue[proc.getPriority()].push(idx);
       }
-
-      io_waitQueue.erase(
-          std::remove(io_waitQueue.begin(), io_waitQueue.end(), idx),
-          io_waitQueue.end());
     }
+
+    IO_Processes.processIO(minTime);
 
     lastTime = currentTime;
 
-    for (size_t i = 0; i < processes.size(); ++i) {
-      const auto &p = processes[i];
-      if (p.remainingtime > 0) {
+    for (size_t idx = 0; idx < process_pool.size(); ++idx) {
+      PCB &proc = process_pool[idx];
+      if (proc.getRemainingTime() > 0) {
         debug(WARNING, [&]() {
           std::ostringstream oss;
-          oss << "[STUCK PROC] PID: " << p.pid
-              << " remaining: " << p.remainingtime
-              << " waiting_io: " << p.waiting_io << " prio: " << p.prio
-              << " contained in readyQueue? " << std::boolalpha
-              << readyQueue[p.prio].contains(i);
+          oss << "[STUCK PROC] PID: " << proc.getPid()
+              << " remaining: " << proc.getRemainingTime()
+              << " waiting_io: " << proc.isWaitingIO()
+              << " prio: " << proc.getPriority() << " contained in readyQueue? "
+              << std::boolalpha << readyQueue[proc.getPriority()].contains(idx);
           return oss.str();
         });
       }
@@ -331,13 +316,15 @@ bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
 void Scheduler::roundRobin() {
   std::unique_lock<std::mutex> lk(schedule_lock);
 
-  for (size_t p = 0; p < processes.size(); p++) {
-    if (processes[p].prio < 0 || processes[p].prio > MAX_PRIORITY) // use clamp!
+  for (size_t p = 0; p < process_pool.size(); p++) {
+    if (process_pool[p].getPriority() < 0 ||
+        process_pool[p].getPriority() > MAX_PRIORITY) // use clamp!
     {
-      processes[p].prio = std::clamp(processes[p].prio, 1, MAX_PRIORITY);
+      process_pool[p].setPriority(
+          std::clamp(process_pool[p].getPriority(), 1, MAX_PRIORITY));
       debug(WARNING, "Clamping prio - otherwise out of index");
     }
-    readyQueue[processes[p].prio].push(p);
+    readyQueue[process_pool[p].getPriority()].push(p);
   }
 
   int currentTime = 0; // track current time
@@ -359,7 +346,7 @@ void Scheduler::roundRobin() {
             if (!readyQueue[prio].empty()) {
               oss << "Priority " << prio << ": " << readyQueue[prio] << "\n";
             }
-            oss << "IO wait queue size: " << io_waitQueue.size()
+            oss << "IO wait queue size: " << IO_Processes.size()
                 << "\n========================\n";
           }
           return oss.str();
@@ -368,27 +355,27 @@ void Scheduler::roundRobin() {
         if (readyQueue.empty())
           continue;
         size_t i = readyQueue[el].pop();
-        auto &p = processes[i];
+        PCB &p = process_pool[i];
 
         //***** Execute process *****//
 
-        bool shouldRequeue = executeProcess(p, currentTime);
-        if (shouldRequeue && p.remainingtime > 0 && !p.waiting_io)
+        bool shouldRequeue = p.execute(currentTime);
+        if (shouldRequeue && p.getRemainingTime() > 0 && !p.isWaitingIO())
           readyQueue[el].push(i);
 
         //***** Update aging *****//
         int delta = std::min(currentTime - lastTime, TIME_QUANTUM);
-        updateQueuesAfterAging(p, delta);
+        updateQueuesAfterAging(&p, delta);
 
         //***** Update IO Wait Queue here! *****//
-        updateIO(p);
+        IO_Processes.updateIO();
 
         //***** IO Wait Queue management! *****//
-        processIO(delta, currentTime);
+        IO_Processes.processIO(delta);
 
         lastTime = currentTime;
         //***** Update logs *****//
-        logEvent(p);
+        logEvent(&p);
         break;
       }
     }
@@ -431,6 +418,12 @@ void Scheduler::run() {
     debug(EXEC, "Finished");
   }
 }
+
+PCB &Scheduler::getProcessByPID(int pid) { return process_pool[pid - 1]; }
+
+size_t Scheduler::pidToIndex(int pid) const { return pid - 1; }
+
+int Scheduler::indexToPid(size_t idx) const { return idx + 1; }
 
 void Scheduler::simulateTime(int ms) {
   std::this_thread::sleep_for(std::chrono::milliseconds(ms));

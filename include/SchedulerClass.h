@@ -3,15 +3,10 @@
 #include "LogsJson.h"
 #include "PCB.h"
 #include "ReadyQueue.h"
-#include <algorithm>
 #include <array>
-#include <chrono>
-#include <deque>
 #include <iostream>
-#include <memory>
 #include <mutex>
 #include <string>
-#include <thread>
 #include <vector>
 
 constexpr int MAX_PRIORITY = 3;
@@ -49,7 +44,7 @@ public:
 
   // This is in between IO Manager + PCB, handle moving process to/from
   // scheduler and IO manager
-  void updateQueuesAfterAging(std::unique_ptr<PCB> &p, int &time_slice);
+  void updateQueuesAfterAging(PCB *p, int &time_slice);
 
   // IO Handling -> IOManager handles this.
   // void updateIO(Process &p);
@@ -57,7 +52,7 @@ public:
   // void handleIOqueue(std::vector<size_t> temp_io, int &currentTime);
 
   // Logging
-  void logEvent(std::unique_ptr<PCB> &p);
+  void logEvent(PCB *p);
   void flushLogs();
 
   // Scheduling + Queues setup.
@@ -94,6 +89,11 @@ private:
 
   // Default debug-level set to NONE
   int debug_level = NONE;
+
+  // Helper methods
+  PCB &getProcessByPID(int pid);
+  size_t pidToIndex(int pid) const;
+  int indexToPid(size_t idx) const;
 
   std::mutex schedule_lock;
 
