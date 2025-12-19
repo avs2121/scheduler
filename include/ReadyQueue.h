@@ -3,7 +3,6 @@
 #include <iostream>
 #include <ostream>
 
-
 template <typename T, size_t N>
 
 class ReadyQueue {

@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 
-
 class IOManager {
 public:
   IOManager() = default;

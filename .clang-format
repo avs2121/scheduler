@@ -1,0 +1,25 @@
+# .clang-format
+# C++23 style, Allman braces, 4-space indent, sorted includes
+
+BasedOnStyle: Google      # Base style to inherit defaults
+Language: Cpp
+Standard: Cpp23
+
+IndentWidth: 4            # 4-space indentation
+TabWidth: 4
+UseTab: Never
+
+BreakBeforeBraces: Allman # Allman-style braces
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+ColumnLimit: 100          # Max line length
+PointerAlignment: Left
+SortIncludes: true        # Sort #includes alphabetically
+
+# Optional: keeps your namespace braces on new lines
+NamespaceIndentation: All
+
+# Keep trailing commas in enum/class lists
+AllowTrailingCommas: true
