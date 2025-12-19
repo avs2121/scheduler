@@ -328,7 +328,8 @@ void Scheduler::roundRobin() {
     }
     readyQueue[process_pool[p].getPriority()].push(p);
   }
-  std::cerr << "in round robin after setting up readyqueue" << std::endl;
+  std::cerr << "in round robin after setting up readyqueue: "
+            << readyQueue.size() << std::endl;
 
   int currentTime = 0; // track current time
   int lastTime = 0;
@@ -340,9 +341,13 @@ void Scheduler::roundRobin() {
     std::cerr << "in while true loop after clean up queues round robin"
               << std::endl;
 
+    for (auto &p : process_pool) {
+      std::cout << p << std::endl;
+    }
+
     // Execute process
     for (auto el = 1; el <= MAX_PRIORITY; ++el) {
-      std::cerr << readyQueue.size() << std::endl;
+      std::cerr << el << std::endl;
       if (!readyQueue[el].empty()) {
 
         debug(QUEUE, [&]() {

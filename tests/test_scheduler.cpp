@@ -46,7 +46,6 @@ public:
     trackFile(logfile);
     Scheduler scheduler(logfile);
 
-    scheduler.setDebugFlags(Scheduler::NONE);
     scheduler.run();
     assert_true(fileExists(logfile), "Log file exists");
     assert_true(countLines(logfile) > 0, "Log file contains lines");
