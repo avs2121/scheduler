@@ -16,6 +16,7 @@ Makefile
 *.log
 *.tmp
 *.bak
+*.cache
 
 # OS files
 .DS_Store
@@ -29,5 +30,7 @@ Thumbs.db
 *.sln
 *.vcxproj*
 
-# Compile commands
+# certain files
 compile_commands.json
+.clang-format
+Funktioner.txt
