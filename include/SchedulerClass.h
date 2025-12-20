@@ -38,18 +38,8 @@ public:
   void findTotalTime();
   void findAvgTime();
 
-  // Execute + Aging  -> PCB Handles this
-  // bool executeProcess(Process &p, int &currentTime);
-  // bool ageProcess(Process &proc, int time_diff);
-
-  // This is in between IO Manager + PCB, handle moving process to/from
-  // scheduler and IO manager
+  // Queue handler
   void updateQueuesAfterAging(PCB *p, int &time_slice);
-
-  // IO Handling -> IOManager handles this.
-  // void updateIO(Process &p);
-  // void processIO(int &time_diff, int &currentTime);
-  // void handleIOqueue(std::vector<size_t> temp_io, int &currentTime);
 
   // Logging
   void logEvent(PCB *p);

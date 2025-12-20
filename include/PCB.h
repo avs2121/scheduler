@@ -62,38 +62,3 @@ private:
   // bool waiting_io;   // true if currently blocked
   ProcessState PS; // Process State
 };
-
-/*
-just to store the old process
-// Process info
-    struct Process
-    {
-        int pid;           // process id
-        int prio;          // current priority
-        int old_prio;      // original prio
-        int bursttime;     // burst time
-        int remainingtime; // remaining time after burst
-        int waiting_time;  // time a process has waited to be executed
-        bool io_bound;     // true if process is I/O bound
-        int io_interval;   // how often in ms it performs I/O
-        int io_remaining;  // how long left of io operation
-        int cpu_used;      // cumulative CPU time used since last I/O
-        bool waiting_io;   // true if currently blocked
-
-        friend std::ostream &operator<<(std::ostream &out, const Process &p)
-        {
-            out << "{PID:" << p.pid
-                << ", Prio:" << p.prio
-                << ", Burst:" << p.bursttime
-                << ", Remain:" << p.remainingtime
-                << ", Waited: " << p.waiting_time
-                << ", io bound: " << std::boolalpha << p.io_bound
-                << ", io interval: " << p.io_interval
-                << ", cpu used: " << p.cpu_used
-                << ", waiting io: " << std::boolalpha << p.waiting_io
-                << "}";
-            return out;
-        }
-    };
-
-*/
