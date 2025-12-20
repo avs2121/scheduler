@@ -28,3 +28,6 @@ Thumbs.db
 *.user
 *.sln
 *.vcxproj*
+
+# Compile commands
+compile_commands.json

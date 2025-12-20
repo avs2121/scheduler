@@ -1,52 +1,26 @@
 [
     {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -c src/PriorityScheduler.cpp",
-        "file": "src/PriorityScheduler.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -c src/SchedulerClass.cpp",
-        "file": "src/SchedulerClass.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -c src/LogsJson.cpp",
-        "file": "src/LogsJson.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -c src/PCB.cpp",
-        "file": "src/PCB.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -c src/IOManager.cpp",
+        "directory": "C:\\Users\\Schio\\source\\repos\\projects\\PriorityScheduling",
+        "arguments": [
+            "g++",
+            "-g",
+            "-std=c++20",
+            "-Wall",
+            "-Iinclude",
+            "-Iinclude",
+            "-Itests",
+            "tests/test_main.cpp",
+            "tests/test_scheduler.cpp",
+            "tests/test_pcb.cpp",
+            "tests/test_io.cpp",
+            "tests/TestFixture.cpp",
+            "src/SchedulerClass.cpp",
+            "src/LogsJson.cpp",
+            "src/PCB.cpp",
+            "src/IOManager.cpp",
+            "-o",
+            "build/bin/test_scheduler"
+        ],
         "file": "src/IOManager.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -Itests -c tests/test_main.cpp",
-        "file": "tests/test_main.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -Itests -c tests/test_scheduler.cpp",
-        "file": "tests/test_scheduler.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -Itests -c tests/test_pcb.cpp",
-        "file": "tests/test_pcb.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -Itests -c tests/test_io.cpp",
-        "file": "tests/test_io.cpp"
-    },
-    {
-        "directory": "c:/Users/Schio/source/repos/projects/PriorityScheduling",
-        "command": "g++ -g -std=c++20 -Wall -Iinclude -Itests -c tests/TestFixture.cpp",
-        "file": "tests/TestFixture.cpp"
     }
 ]

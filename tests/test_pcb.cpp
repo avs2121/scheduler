@@ -37,8 +37,8 @@ public:
                  " Process [p_io] should have cpu used = 2");
 
     PCB p_finish(3, 1, 2, false, 0);
-    assert_true(!p_finish.execute(TIME_QUANTUM),
-                " Process [p_finish] should finish in one TIME QUANTUM");
+    assert_equal(p_finish.execute(TIME_QUANTUM), 2,
+                 " Process [p_finish] should finish with execute time = 2");
     assert_equal(p_finish.getRemainingTime(), 0,
                  " Process [p_finish] should have remaining time = 0");
     assert_equal(p_finish.getCpuUsed(), 2,

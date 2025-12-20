@@ -4,7 +4,6 @@
 #include "PCB.h"
 #include "ReadyQueue.h"
 #include <sstream>
-#include <thread>
 
 Scheduler::Scheduler(std::string logs_name)
     : IO_Processes(process_pool), logs_name(logs_name) {
@@ -283,7 +282,7 @@ size_t Scheduler::pidToIndex(int pid) const { return pid - 1; }
 int Scheduler::indexToPid(size_t idx) const { return idx + 1; }
 
 void Scheduler::simulateTime(int ms) {
-  std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+  // std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
 void Scheduler::setDebugFlags(int flags) { this->debug_level = flags; }

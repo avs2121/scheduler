@@ -6,6 +6,7 @@ INC_PATH = include
 TEST_PATH = tests
 BUILD_DIR = build
 BIN_DIR = bin
+LOG_DIR = logs
 BIN_PATH = $(BUILD_DIR)/$(BIN_DIR)
 
 #Source files
@@ -30,6 +31,7 @@ all: build $(TGT_MAIN) $(TGT_TEST)
 build:
 	@echo "Generating build directory '$(BIN_PATH)'..."
 	@mkdir -p $(BIN_PATH)
+	@mkdir -p $(LOG_DIR)
 
 # Link both .cpp files into one executable
 $(TGT_MAIN): $(MAIN_SRC) $(SRC) $(INC)
@@ -64,14 +66,12 @@ tests: build $(TGT_TEST)
 clean:
 	@echo "Cleaning build directory and log files..."
 	rm -rf $(BUILD_DIR)
-	rm -f *.json
-	rm -f $(TEST_PATH)/*.json
 	@echo "Clean complete"
 
 # Clean only log files
 clean-logs:
 	@echo "Cleaning log files..."
-	rm -f *.json
+	rm -f $(LOG_DIR)*.json
 	rm -f $(TEST_PATH)/*.json
 	@echo "Logs cleaned"
 

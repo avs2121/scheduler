@@ -1,4 +1,5 @@
 #include "SchedulerClass.h"
+#include <thread>
 
 int main() {
   Scheduler scheduler("proces_logs");
