@@ -250,28 +250,30 @@ void Scheduler::run() {
   };
   Process_STATE curr_state = Process_STATE::READY;
 
-  switch (curr_state) {
-  case Process_STATE::READY:
-    // std::cout << "IN ready state" << std::endl;
-    curr_state = Process_STATE::RUNNING;
-    break;
+  while (curr_state != Process_STATE::FINISHED) {
+    switch (curr_state) {
+    case Process_STATE::READY:
+      // std::cout << "IN ready state" << std::endl;
+      curr_state = Process_STATE::RUNNING;
+      break;
 
-  case Process_STATE::RUNNING:
-    // std::cout << "IN running state" << std::endl;
-    priorityScheduling();
-    roundRobin();
-    curr_state = Process_STATE::FINISHED;
-    break;
+    case Process_STATE::RUNNING:
+      // std::cout << "IN running state" << std::endl;
+      priorityScheduling();
+      roundRobin();
+      curr_state = Process_STATE::FINISHED;
+      break;
 
-  case Process_STATE::FINISHED:
-    // std::cout << "IN finished state" << std::endl;
-    // findAvgTime();
-    // std::chrono::steady_clock::time_point end =
-    // std::chrono::steady_clock::now(); debug(EXEC,
-    // std::chrono::duration_cast<std::chrono::milliseconds>(end -
-    // begin).count());
-    debug(EXEC, "Finished");
-    break;
+    case Process_STATE::FINISHED:
+      // std::cout << "IN finished state" << std::endl;
+      // findAvgTime();
+      // std::chrono::steady_clock::time_point end =
+      // std::chrono::steady_clock::now(); debug(EXEC,
+      // std::chrono::duration_cast<std::chrono::milliseconds>(end -
+      // begin).count());
+      debug(EXEC, "Finished");
+      break;
+    }
   }
 }
 
