@@ -12,7 +12,7 @@ PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval)
   this->PS = ProcessState::READY;
 }
 
-bool PCB::execute(int timeslice) {
+int PCB::execute(int timeslice) {
   int executeTime = 0;
 
   if (io_bound) {
@@ -23,7 +23,7 @@ bool PCB::execute(int timeslice) {
   }
 
   if (executeTime <= 0) {
-    return false;
+    return 0;
   }
 
   PS = ProcessState::RUNNING;
@@ -31,10 +31,8 @@ bool PCB::execute(int timeslice) {
   cpu_used += executeTime;
 
   if (remainingtime <= 0) {
-
     PS = ProcessState::FINISHED;
     remainingtime = 0;
-    return false;
   }
 
   else if (io_bound && cpu_used >= io_interval) {
@@ -42,8 +40,11 @@ bool PCB::execute(int timeslice) {
     return false;
   }
 
-  PS = ProcessState::READY;
-  return true; // requeue process (not finished)
+  else {
+    PS = ProcessState::READY; // requeue process (not finished)
+  }
+
+  return executeTime;
 }
 
 bool PCB::ageProcess(int timediff) {

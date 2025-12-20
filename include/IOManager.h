@@ -21,6 +21,7 @@ public:
 
   // Utility methods
   void clear();
+  void clearFinished();
   int getMinRemainingIOTime() const;
   void printQueue() const;
 

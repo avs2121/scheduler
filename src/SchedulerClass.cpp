@@ -257,6 +257,7 @@ bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
     }
   }
 
+  std::cerr << "check if processes are in io wait" << std::endl;
   // If all processes are in IO wait, advance time
   if (!anyQueueHasWork && !IO_Processes.isEmpty()) {
     // Find minimum IO remaining time
@@ -267,20 +268,18 @@ bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
     currentTime += minTime;
 
     // Process IO completions
-    std::vector<size_t> temp_ready; // hold finished I/O process
+    IO_Processes.processIO(minTime);
 
-    for (size_t idx : IO_Processes.getQueue()) {
-      PCB &proc = process_pool[idx];
-      proc.setIOTime(proc.getIORemainingTime() - minTime);
-      if (proc.getIORemainingTime() <= 0) {
-        temp_ready.push_back(idx);
-      }
-    }
+    // Hold finished processes
+    const auto &finished = IO_Processes.getFinishedProcesses();
+    std::cerr << "Finished IO count: " << finished.size() << std::endl;
 
     // Reinsert completed IO processes
-    for (auto idx : temp_ready) {
+    for (auto idx : finished) {
       PCB &proc = process_pool[idx];
-      proc.setIOTime(0);
+      std::cerr << "Process " << proc.getPid()
+                << " remaining: " << proc.getRemainingTime()
+                << " state: " << proc.getStringState() << std::endl;
 
       if (proc.getRemainingTime() > 0) {
         debug(QUEUE, "[IO DONE] PID " + std::to_string(proc.getPid()) +
@@ -290,7 +289,7 @@ bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
       }
     }
 
-    IO_Processes.processIO(minTime);
+    IO_Processes.clearFinished();
 
     lastTime = currentTime;
 
@@ -341,10 +340,6 @@ void Scheduler::roundRobin() {
     std::cerr << "in while true loop after clean up queues round robin"
               << std::endl;
 
-    for (auto &p : process_pool) {
-      std::cout << p << std::endl;
-    }
-
     // Execute process
     for (auto el = 1; el <= MAX_PRIORITY; ++el) {
       std::cerr << el << std::endl;
@@ -372,15 +367,23 @@ void Scheduler::roundRobin() {
 
         std::cerr << "in before execute process in round robin" << std::endl;
 
-        bool shouldRequeue = p.execute(currentTime);
-        if (shouldRequeue && p.getRemainingTime() > 0 && !p.isWaitingIO())
+        int timeElapsed = p.execute(TIME_QUANTUM);
+        std::cout << "time elapsed: " << timeElapsed << std::endl;
+        std::cout << p << std::endl;
+
+        if (p.isWaitingIO() && !IO_Processes.containsPID(p.getPid())) {
+          IO_Processes.enqueue(i);
+        }
+
+        if (p.isReady() && timeElapsed > 0)
           readyQueue[el].push(i);
 
         //***** Update aging *****//
 
-        std::cerr << "in before update aging round robin" << std::endl;
-
-        int delta = std::min(currentTime - lastTime, TIME_QUANTUM);
+        std::cerr << "in before update aging round robin, time : "
+                  << currentTime << std::endl;
+        currentTime += timeElapsed;
+        int delta = currentTime - lastTime;
         updateQueuesAfterAging(&p, delta);
 
         //***** Update IO Wait Queue here! *****//
@@ -392,6 +395,18 @@ void Scheduler::roundRobin() {
         std::cerr << "in before process io round robin" << std::endl;
 
         IO_Processes.processIO(delta);
+
+        // move finished processes
+        const auto &finished = IO_Processes.getFinishedProcesses();
+        for (size_t idx : finished) {
+          PCB &proc = process_pool[idx];
+          if (proc.getRemainingTime() > 0 && proc.isReady()) {
+            readyQueue[proc.getPriority()].push(idx);
+          }
+        }
+        if (!finished.empty()) {
+          IO_Processes.clearFinished();
+        }
 
         lastTime = currentTime;
         //***** Update logs *****//

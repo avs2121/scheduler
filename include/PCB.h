@@ -17,7 +17,7 @@ class PCB {
 public:
   PCB(int pid, int prio, int burst, bool io_bound, int io_interval);
 
-  bool execute(int timeslice);
+  int execute(int timeslice);
   bool ageProcess(int timediff);
 
   // Getters

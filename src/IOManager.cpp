@@ -82,6 +82,8 @@ void IOManager::clear() {
   finished_IO.clear();
 }
 
+void IOManager::clearFinished() { finished_IO.clear(); }
+
 int IOManager::getMinRemainingIOTime() const {
   int min = INT_MAX;
   for (size_t idx : IO_queue) {
