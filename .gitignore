@@ -16,7 +16,6 @@ Makefile
 *.log
 *.tmp
 *.bak
-*.cache
 
 # OS files
 .DS_Store
@@ -34,3 +33,6 @@ Thumbs.db
 compile_commands.json
 .clang-format
 Funktioner.txt
+
+# cache directories 
+.cache/
