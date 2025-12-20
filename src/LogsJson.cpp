@@ -1,16 +1,16 @@
 #include "LogsJson.h"
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdint.h>
 
-namespace fs = std::filesystem;
-
-static const fs::path LOG_DIR = "logs";
-
 /*
 Consider Adding Atomic Write.
 */
+
+namespace fs = std::filesystem;
+static fs::path LOG_DIR = "logs";
+
+void setLogDirectory(const fs::path &dir) { LOG_DIR = dir; }
 
 void ensureLogDirExists() {
   std::error_code ec;
