@@ -13,14 +13,7 @@ PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval)
 }
 
 int PCB::execute(int timeslice) {
-  int executeTime = 0;
-
-  if (io_bound) {
-    executeTime =
-        std::min({timeslice, remainingtime, (io_interval - cpu_used)});
-  } else {
-    executeTime = std::min(timeslice, remainingtime);
-  }
+  int executeTime = computeExecuteTime(timeslice);
 
   if (executeTime <= 0) {
     return 0;
@@ -30,34 +23,45 @@ int PCB::execute(int timeslice) {
   remainingtime -= executeTime;
   cpu_used += executeTime;
 
-  if (remainingtime <= 0) {
-    PS = ProcessState::FINISHED;
-    remainingtime = 0;
-  }
-
-  else if (io_bound && cpu_used >= io_interval) {
-    PS = ProcessState::WAITING_IO;
-    return false;
-  }
-
-  else {
-    PS = ProcessState::READY; // requeue process (not finished)
-  }
+  updateStatesAfterExecution();
 
   return executeTime;
+}
+
+int PCB::computeExecuteTime(int timeslice) {
+  if (io_bound) {
+    return std::min({timeslice, remainingtime, (io_interval - cpu_used)});
+  } else {
+    return std::min(timeslice, remainingtime);
+  }
 }
 
 bool PCB::ageProcess(int timediff) {
   waiting_time += timediff;
 
-  // Aging threshold proportional with time quantum. (40 sec)
-  if (waiting_time >= 5 * TIME_QUANTUM && prio > 1) {
+  // Aging threshold proportional with time quantum. (5 * 4)
+  if (waiting_time >= AGING_THRESHOLD * TIME_QUANTUM && prio > 1) {
     old_prio = prio;
     prio--;
     waiting_time = 0;
     return true;
   }
   return false;
+}
+
+void PCB::updateStatesAfterExecution() {
+  if (remainingtime <= 0) {
+    PS = ProcessState::FINISHED; // process is finished executing.
+    remainingtime = 0;
+  }
+
+  else if (io_bound && cpu_used >= io_interval) {
+    PS = ProcessState::WAITING_IO; // process IO-interval reached go into wait.
+  }
+
+  else {
+    PS = ProcessState::READY; // requeue process (not finished).
+  }
 }
 
 int PCB::getPid() const { return pid; }

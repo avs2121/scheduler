@@ -23,7 +23,7 @@ public:
     IO = 1 << 2,      // 4
     QUEUE = 1 << 3,   // 8
     WARNING = 1 << 4, // 16
-    ALL = 0xFFFF      // 65535
+    ALL = 0xFFFF
   };
 
   // Debug
@@ -35,8 +35,7 @@ public:
 
   // Time tracking -> Not implemented properly.
   void findWaitTime();
-  void findTotalTime();
-  void findAvgTime();
+  void findTurnaroundTime();
 
   // Queue handler
   void updateQueuesAfterAging(PCB *p, int &time_slice);
@@ -84,8 +83,6 @@ private:
   PCB &getProcessByPID(int pid);
   size_t pidToIndex(int pid) const;
   int indexToPid(size_t idx) const;
-
-  std::mutex schedule_lock;
 
   // clang-format off
   std::array<PCB, N> process_pool = {

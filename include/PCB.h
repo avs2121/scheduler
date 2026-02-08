@@ -2,6 +2,7 @@
 #include <ostream>
 
 constexpr int TIME_QUANTUM = 4;
+constexpr int AGING_THRESHOLD = 5;
 constexpr int N = 6;
 
 enum class ProcessState {
@@ -18,7 +19,9 @@ public:
   PCB(int pid, int prio, int burst, bool io_bound, int io_interval);
 
   int execute(int timeslice);
+  int computeExecuteTime(int timeslice);
   bool ageProcess(int timediff);
+  void updateStatesAfterExecution();
 
   // Getters
   int getPid() const;

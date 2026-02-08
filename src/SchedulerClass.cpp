@@ -13,20 +13,17 @@ Scheduler::Scheduler(std::string logs_name)
   createJSON(logs_name);
 }
 
+// time spent in ready queue
 void Scheduler::findWaitTime() {
   wait_time[0] = 0; // set to 0, because first element has no waittime
 }
 
-void Scheduler::findTotalTime() {}
-
-void Scheduler::findAvgTime() {
-  std::unique_lock<std::mutex> lk(schedule_lock);
-  findWaitTime();
-  findTotalTime();
+// total time from submission to completion
+void Scheduler::findTurnaroundTime() {
+  //
 }
 
 void Scheduler::priorityScheduling() {
-  std::unique_lock<std::mutex> lk(schedule_lock);
   std::sort(process_pool.begin(), process_pool.end(),
             [](const PCB &a, const PCB &b) {
               return a.getPriority() < b.getPriority();
@@ -143,7 +140,6 @@ bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
 }
 
 void Scheduler::roundRobin() {
-  std::unique_lock<std::mutex> lk(schedule_lock);
   for (size_t p = 0; p < process_pool.size(); p++) {
     if (process_pool[p].getPriority() < 0 ||
         process_pool[p].getPriority() > MAX_PRIORITY) // use clamp!

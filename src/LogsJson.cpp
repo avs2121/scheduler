@@ -22,7 +22,7 @@ fs::path makeLogPath(const std::string &filename) {
   return LOG_DIR / extensionJSON(filename);
 }
 
-// ensure correct fileformat (on windows)
+// ensure correct fileformat
 std::string extensionJSON(const std::string &filename) {
   if (filename.size() < 5 || filename.substr(filename.size() - 5) != ".json") {
     return filename + ".json";
