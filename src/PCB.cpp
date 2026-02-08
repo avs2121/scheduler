@@ -9,6 +9,8 @@ PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval)
   this->waiting_time = 0;
   this->io_remaining = 0;
   this->cpu_used = 0;
+  this->completion_time = -1;
+  this->total_io_time = 0;
   this->PS = ProcessState::READY;
 }
 
@@ -81,6 +83,10 @@ int PCB::getRemainingTime() const { return remainingtime; }
 int PCB::getIORemainingTime() const { return io_remaining; }
 
 int PCB::getWaitingTime() const { return waiting_time; }
+
+int PCB::getCompletionTime() const { return completion_time; }
+
+int PCB::getTotalIOTime() const { return total_io_time; }
 
 ProcessState PCB::getState() const { return PS; }
 

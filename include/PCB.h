@@ -33,8 +33,10 @@ public:
   int getRemainingTime() const;
   int getIORemainingTime() const;
   int getWaitingTime() const;
+  int getCompletionTime() const;
+  int getTotalIOTime() const;
   bool isIOBound() const;
-  // bool isWaitingIO() const;
+
   ProcessState getState() const;
   std::string getStringState() const;
 
@@ -52,16 +54,17 @@ public:
   bool isFinished() const;
 
 private:
-  int pid;           // process id
-  int prio;          // current priority
-  int old_prio;      // original prio
-  int bursttime;     // burst time
-  int remainingtime; // remaining time after burst
-  int waiting_time;  // time a process has waited to be executed
-  bool io_bound;     // true if process is I/O bound
-  int io_interval;   // how often in ms it performs I/O
-  int io_remaining;  // how long left of io operation
-  int cpu_used;      // cumulative CPU time used since last I/O
-  // bool waiting_io;   // true if currently blocked
-  ProcessState PS; // Process State
+  int pid;             // process id
+  int prio;            // current priority
+  int old_prio;        // original prio
+  int bursttime;       // burst time
+  int remainingtime;   // remaining time after burst
+  int waiting_time;    // time a process has waited to be executed
+  bool io_bound;       // true if process is I/O bound
+  int io_interval;     // how often in ms it performs I/O
+  int io_remaining;    // how long left of io operation
+  int cpu_used;        // cumulative CPU time used since last I/O
+  int completion_time; // set this, when process completes
+  int total_io_time;   // total time spent in i/o wait
+  ProcessState PS;     // Process State
 };

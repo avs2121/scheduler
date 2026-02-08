@@ -5,7 +5,6 @@
 #include "ReadyQueue.h"
 #include <array>
 #include <iostream>
-#include <mutex>
 #include <string>
 #include <vector>
 
@@ -36,6 +35,7 @@ public:
   // Time tracking -> Not implemented properly.
   void findWaitTime();
   void findTurnaroundTime();
+  void findResponseTime();
 
   // Queue handler
   void updateQueuesAfterAging(PCB *p, int &time_slice);
@@ -99,8 +99,6 @@ private:
   std::array<ReadyQueue<size_t, N * 2>, MAX_PRIORITY + 1> readyQueue;
   IOManager IO_Processes;
 
-  int time_pid;
-  int total_wait_time;
   std::string logs_name;
   std::vector<json> eventLog; // store json objects for logging
 };

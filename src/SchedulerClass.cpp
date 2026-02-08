@@ -8,8 +8,6 @@
 Scheduler::Scheduler(std::string logs_name)
     : IO_Processes(process_pool), logs_name(logs_name) {
   wait_time.resize(N, 0);
-  time_pid = 0;
-  total_wait_time = 0;
   createJSON(logs_name);
 }
 
@@ -20,6 +18,11 @@ void Scheduler::findWaitTime() {
 
 // total time from submission to completion
 void Scheduler::findTurnaroundTime() {
+  //
+}
+
+// time from submission to first reponse
+void Scheduler::findResponseTime() {
   //
 }
 
