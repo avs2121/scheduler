@@ -2,7 +2,7 @@
 
 #include <LogsJson.h>
 
-Metrics::Metrics(std::array<PCB, N * 2>& process_pool) : process_pool(process_pool), metrics_calculated(false)
+Metrics::Metrics(std::array<PCB, N>& process_pool) : process_pool(process_pool), metrics_calculated(false)
 {
 }
 
@@ -32,7 +32,7 @@ SystemMetrics Metrics::calculate(int total_time)
         metrics.per_process.push_back(pm);
     }
 
-    metrics.avg_trunaround_time = static_cast<double>(total_turnaround_time) / N;
+    metrics.avg_turnaround_time = static_cast<double>(total_turnaround_time) / N;
     metrics.avg_waiting_time = static_cast<double>(total_waiting_time) / N;
     metrics.avg_response_time = static_cast<double>(total_response_time) / N;
     metrics.cpu_utilization = (static_cast<double>(total_cpu_time) / total_time) * 100;
@@ -73,8 +73,27 @@ json Metrics::toJson() const
         throw std::runtime_error("Metrics not calculated yet");
     }
 
-    // format the data to json format.
-    // one for system metrics and one for each process
+    json summary = {{"system metrics",
+                     {"Average turnaround time", cached_metrics.avg_turnaround_time},
+                     {"Average waiting time", cached_metrics.avg_waiting_time},
+                     {"Average response time", cached_metrics.avg_response_time},
+                     {"CPU Utilization", cached_metrics.cpu_utilization},
+                     {"Throughput", cached_metrics.throughput},
+                     {"total time", cached_metrics.total_time},
+                     {"total processes", cached_metrics.total_processes}},
+                    {"process metrics", json::array_t()}};
+
+    for (const auto& pm : cached_metrics.per_process)
+    {
+        summary["process metrics"].push_back({{"PID", pm.pid},
+                                              {"Turnaround time", pm.turnaround_time},
+                                              {"Waiting time", pm.waiting_time},
+                                              {"Response time", pm.response_time},
+                                              {"CPU time used", pm.cpu_time_used},
+                                              {"IO time used", pm.io_time_used},
+                                              {"Completion time", pm.completion_time}});
+    }
+    return summary;
 }
 void Metrics::writeToFile(const std::string& name) const
 {
@@ -105,7 +124,7 @@ double Metrics::getAvgTurnaroundTime() const
     {
         throw std::runtime_error("Metrics not calculated yet");
     }
-    return cached_metrics.avg_trunaround_time;
+    return cached_metrics.avg_turnaround_time;
 }
 double Metrics::getCpuUtilization() const
 {

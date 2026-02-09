@@ -21,7 +21,7 @@ struct ProcessMetrics
 
 struct SystemMetrics
 {
-    double avg_trunaround_time;
+    double avg_turnaround_time;
     double avg_waiting_time;
     double avg_response_time;
     double cpu_utilization;  // (total cpu time / total time) * 100 (for procent)
@@ -34,7 +34,7 @@ struct SystemMetrics
 class Metrics
 {
    public:
-    Metrics(std::array<PCB, N * 2>& process_pool);
+    Metrics(std::array<PCB, N>& process_pool);
 
     // calculate metrics from process pool
     SystemMetrics calculate(int total_time);
@@ -50,7 +50,7 @@ class Metrics
     double getCpuUtilization() const;
 
    private:
-    const std::array<PCB, N * 2>& process_pool;
+    const std::array<PCB, N>& process_pool;
     SystemMetrics cached_metrics;
     bool metrics_calculated;
 

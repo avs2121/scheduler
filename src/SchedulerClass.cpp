@@ -7,16 +7,14 @@
 #include "PCB.h"
 #include "ReadyQueue.h"
 
-Scheduler::Scheduler(std::string logs_name) : IO_Processes(process_pool), logs_name(logs_name)
+Scheduler::Scheduler(std::string logs_name) : IO_Processes(process_pool), metrics(process_pool), logs_name(logs_name)
 {
-    wait_time.resize(N, 0);
     createJSON(logs_name);
 }
 
 // time spent in ready queue
 void Scheduler::findWaitTime()
 {
-    wait_time[0] = 0;  // set to 0, because first element has no waittime
 }
 
 // total time from submission to completion
@@ -295,11 +293,10 @@ void Scheduler::run()
 
             case Process_STATE::FINISHED:
                 // std::cout << "IN finished state" << std::endl;
-                // findAvgTime();
-                // std::chrono::steady_clock::time_point end =
-                // std::chrono::steady_clock::now(); debug(EXEC,
-                // std::chrono::duration_cast<std::chrono::milliseconds>(end -
-                // begin).count());
+
+                SystemMetrics sm{};
+                sm = metrics.calculate(currentTime);
+                metrics.writeToFile(logs_name + "_metrics");
                 debug(EXEC, "Finished");
                 break;
         }

@@ -6,6 +6,7 @@
 
 #include "IOManager.h"
 #include "LogsJson.h"
+#include "Metrics.h"
 #include "PCB.h"
 #include "ReadyQueue.h"
 
@@ -100,9 +101,10 @@ class Scheduler
   };
     // clang-format on
 
-    std::vector<int> wait_time;
+    int currentTime;
     std::array<ReadyQueue<size_t, N * 2>, MAX_PRIORITY + 1> readyQueue;
     IOManager IO_Processes;
+    Metrics metrics;
 
     std::string logs_name;
     std::vector<json> eventLog;  // store json objects for logging
