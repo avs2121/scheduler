@@ -1,4 +1,5 @@
 #include "PCB.h"
+
 #include <algorithm>
 
 PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval)
@@ -119,6 +120,8 @@ void PCB::setPriority(int prio_) { this->prio = prio_; }
 void PCB::setIOTime(int io_remainingtime_) {
   this->io_remaining = io_remainingtime_;
 }
+
+void PCB::incrementTotalIO(int time) { this->total_io_time += time; }
 
 void PCB::resetIO() {
   this->cpu_used = 0;

@@ -1,8 +1,9 @@
 #pragma once
-#include "PCB.h"
-#include "nlohmann/json.hpp"
 #include <array>
 #include <vector>
+
+#include "PCB.h"
+#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
@@ -34,11 +35,26 @@ class Metrics {
 public:
     Metrics(std::array<PCB, N * 2>& process_pool);
 
-    //calculate metrics
+    //calculate metrics from process pool
+    SystemMetrics calculate(int total_time); 
 
     //to json format
-
     //write to file 
+    json toJson() const; 
+    void writeToFile(const std::string& name) const; 
+    
+    //process metrics
+    ProcessMetrics getProcessMetrics(int pid) const; 
+    double getAvgTurnaroundTime() const; 
+    double getCpuUtilization() const; 
 
 private:
+    const std::array<PCB, N * 2>& process_pool;
+    SystemMetrics cached_metrics; 
+    bool metrics_calculated;   
+
+    // private helper methods
+    ProcessMetrics calculateProcessMetrics(const PCB& proc) const; 
+    double calculateCpuUtilization(int total_cpu_time, int total_time) const; 
+    double calculateThroughput(int total_time, int num_processes) const; 
 };

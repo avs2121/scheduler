@@ -1,4 +1,5 @@
 #include "IOManager.h"
+
 #include <algorithm>
 #include <array>
 #include <climits>
@@ -10,7 +11,6 @@ IOManager::IOManager(std::array<PCB, N> &process_pool)
 void IOManager::enqueue(size_t idx) { IO_queue.push_back(idx); }
 
 void IOManager::updateIO() {
-
   if (IO_queue.empty())
     return;
 
@@ -34,6 +34,8 @@ void IOManager::processIO(int timeslice) {
     PCB &proc = process_pool[idx];
     if (proc.getIORemainingTime() > 0) {
       proc.setIOTime(std::max(0, proc.getIORemainingTime() - time_diff));
+      proc.incrementTotalIO(
+          std::max(proc.getIORemainingTime() - time_diff, time_diff));
     }
 
     if (proc.getIORemainingTime() <= 0) {

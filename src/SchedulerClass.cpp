@@ -1,9 +1,11 @@
 #include "SchedulerClass.h"
+
+#include <sstream>
+
 #include "IOManager.h"
 #include "LogsJson.h"
 #include "PCB.h"
 #include "ReadyQueue.h"
-#include <sstream>
 
 Scheduler::Scheduler(std::string logs_name)
     : IO_Processes(process_pool), logs_name(logs_name) {
@@ -91,7 +93,6 @@ void Scheduler::flushLogs() {
 }
 
 bool Scheduler::cleanUpQueues(int &currentTime, int &lastTime) {
-
   // Check if all work is done.
   bool hasRemainingWork =
       std::any_of(process_pool.begin(), process_pool.end(),
@@ -164,7 +165,6 @@ void Scheduler::roundRobin() {
     // Execute process
     for (auto el = 1; el <= MAX_PRIORITY; ++el) {
       if (!readyQueue[el].empty()) {
-
         debug(QUEUE, [&]() {
           std::ostringstream oss;
           oss << "=== Queue status at time " << currentTime << " ===\n";

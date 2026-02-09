@@ -1,12 +1,13 @@
 #pragma once
-#include "IOManager.h"
-#include "LogsJson.h"
-#include "PCB.h"
-#include "ReadyQueue.h"
 #include <array>
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include "IOManager.h"
+#include "LogsJson.h"
+#include "PCB.h"
+#include "ReadyQueue.h"
 
 constexpr int MAX_PRIORITY = 3;
 

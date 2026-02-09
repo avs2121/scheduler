@@ -1,6 +1,7 @@
+#include <thread>
+
 #include "LogsJson.h"
 #include "SchedulerClass.h"
-#include <thread>
 
 int main() {
   setLogDirectory(std::filesystem::path("..") / "logs");

@@ -44,6 +44,7 @@ public:
   void setState(ProcessState state);
   void setPriority(int prio);
   void setIOTime(int io_remainingtime);
+  void incrementTotalIO(int time);
   void resetIO();
   void startIO();
 
@@ -65,6 +66,6 @@ private:
   int io_remaining;    // how long left of io operation
   int cpu_used;        // cumulative CPU time used since last I/O
   int completion_time; // set this, when process completes
-  int total_io_time;   // total time spent in i/o wait
+  int total_io_time;   // total time spent in i/o wait -> updated in IOManager
   ProcessState PS;     // Process State
 };

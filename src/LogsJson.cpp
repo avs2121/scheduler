@@ -1,7 +1,9 @@
 #include "LogsJson.h"
+
+#include <stdint.h>
+
 #include <fstream>
 #include <iostream>
-#include <stdint.h>
 
 /*
 Consider Adding Atomic Write.
