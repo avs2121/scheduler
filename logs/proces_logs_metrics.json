@@ -1,0 +1,69 @@
+[
+    {
+        "process_metrics": [
+            {
+                "CPU time used": 18,
+                "Completion time": 0,
+                "IO time used": 93,
+                "PID": 3,
+                "Response time": 0,
+                "Turnaround time": 94,
+                "Waiting time": -17
+            },
+            {
+                "CPU time used": 0,
+                "Completion time": 0,
+                "IO time used": 0,
+                "PID": 6,
+                "Response time": 0,
+                "Turnaround time": 13,
+                "Waiting time": 13
+            },
+            {
+                "CPU time used": 5,
+                "Completion time": 0,
+                "IO time used": 40,
+                "PID": 1,
+                "Response time": 0,
+                "Turnaround time": 65,
+                "Waiting time": 20
+            },
+            {
+                "CPU time used": 0,
+                "Completion time": 0,
+                "IO time used": 0,
+                "PID": 4,
+                "Response time": 0,
+                "Turnaround time": 35,
+                "Waiting time": 35
+            },
+            {
+                "CPU time used": 0,
+                "Completion time": 0,
+                "IO time used": 0,
+                "PID": 2,
+                "Response time": 0,
+                "Turnaround time": 43,
+                "Waiting time": 43
+            },
+            {
+                "CPU time used": 0,
+                "Completion time": 0,
+                "IO time used": 0,
+                "PID": 5,
+                "Response time": 0,
+                "Turnaround time": 58,
+                "Waiting time": 58
+            }
+        ],
+        "system_metrics": {
+            "Average response time": 0.0,
+            "Average turnaround time": 51.333333333333336,
+            "Average waiting time": 25.333333333333332,
+            "CPU Utilization": 24.46808510638298,
+            "Throughput": 0.06382978723404255,
+            "total processes": 6,
+            "total time": 94
+        }
+    }
+]

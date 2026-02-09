@@ -164,7 +164,7 @@ void Scheduler::roundRobin()
         readyQueue[process_pool[p].getPriority()].push(p);
     }
 
-    int currentTime = 0;  // track current time
+    currentTime = 0;  // track current time
     int lastTime = 0;
 
     while (true)
@@ -265,9 +265,6 @@ void Scheduler::roundRobin()
 
 void Scheduler::run()
 {
-    // std::chrono::steady_clock::time_point begin =
-    // std::chrono::steady_clock::now();
-
     enum Process_STATE
     {
         READY,
@@ -276,30 +273,47 @@ void Scheduler::run()
     };
     Process_STATE curr_state = Process_STATE::READY;
 
-    while (curr_state != Process_STATE::FINISHED)
+    bool finished_flag = false;
+    while (!finished_flag)
     {
         switch (curr_state)
         {
             case Process_STATE::READY:
-                // std::cout << "IN ready state" << std::endl;
+                debug(EXEC, "In Process_State ready");
                 curr_state = Process_STATE::RUNNING;
                 break;
 
             case Process_STATE::RUNNING:
-                // std::cout << "IN running state" << std::endl;
+                debug(EXEC, "In Process_State Running");
                 priorityScheduling();
                 roundRobin();
                 curr_state = Process_STATE::FINISHED;
                 break;
 
             case Process_STATE::FINISHED:
-                // std::cout << "IN finished state" << std::endl;
-
                 debug(EXEC, "In Process_State finished");
                 SystemMetrics sm{};
                 sm = metrics.calculate(currentTime);
+
+                // clang-format off
+                debug(EXEC,
+                      [&]()
+                      {
+                          std::ostringstream oss;
+                          oss << "Total time: " << sm.total_time 
+                              << "\nTotal processes: " << sm.total_processes 
+                              << "\nAverage response time: " << sm.avg_response_time 
+                              << "\nAverage turnaround time: " << sm.avg_turnaround_time 
+                              << "\nAverage waiting time: " << sm.avg_waiting_time 
+                              << "\nCPU util: " << sm.cpu_utilization
+                              << "\nThroughput: " << sm.throughput;
+                          return oss.str();
+                      });
+                // clang-format
+
                 metrics.writeToFile(logs_name + "_metrics");
                 debug(EXEC, "Finished");
+                finished_flag = true;
                 break;
         }
     }

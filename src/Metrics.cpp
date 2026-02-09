@@ -2,6 +2,8 @@
 
 #include <LogsJson.h>
 
+#include <iostream>
+
 Metrics::Metrics(std::array<PCB, N>& process_pool) : process_pool(process_pool), metrics_calculated(false)
 {
 }
@@ -75,19 +77,37 @@ json Metrics::toJson() const
         throw std::runtime_error("Metrics not calculated yet");
     }
 
-    json summary = {{"system metrics",
-                     {"Average turnaround time", cached_metrics.avg_turnaround_time},
-                     {"Average waiting time", cached_metrics.avg_waiting_time},
-                     {"Average response time", cached_metrics.avg_response_time},
-                     {"CPU Utilization", cached_metrics.cpu_utilization},
-                     {"Throughput", cached_metrics.throughput},
-                     {"total time", cached_metrics.total_time},
-                     {"total processes", cached_metrics.total_processes}},
-                    {"process metrics", json::array_t()}};
+    json summary;
+    summary["system_metrics"] = {{"Average turnaround time", cached_metrics.avg_turnaround_time},
+                                 {"Average waiting time", cached_metrics.avg_waiting_time},
+                                 {"Average response time", cached_metrics.avg_response_time},
+                                 {"CPU Utilization", cached_metrics.cpu_utilization},
+                                 {"Throughput", cached_metrics.throughput},
+                                 {"total time", cached_metrics.total_time},
+                                 {"total processes", cached_metrics.total_processes}},
+    summary["process_metrics"] = json::array();
+
+    if (!summary.contains("process_metrics"))
+    {
+        std::cerr << "mistake in naming of process metrics field in json" << std::endl;
+    }
+    else
+    {
+        std::cerr << "EXSITS!!" << std::endl;
+    }
+
+    if (!summary.contains("system_metrics"))
+    {
+        std::cerr << "mistake in naming of system metrics field in json" << std::endl;
+    }
+    else
+    {
+        std::cerr << "EXSITS!!" << std::endl;
+    }
 
     for (const auto& pm : cached_metrics.per_process)
     {
-        summary["process metrics"].push_back({{"PID", pm.pid},
+        summary["process_metrics"].push_back({{"PID", pm.pid},
                                               {"Turnaround time", pm.turnaround_time},
                                               {"Waiting time", pm.waiting_time},
                                               {"Response time", pm.response_time},

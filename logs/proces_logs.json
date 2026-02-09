@@ -1,6 +1,7 @@
 [
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": true,
         "io interval": 9,
@@ -11,6 +12,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -21,6 +23,7 @@
     },
     {
         "CPU used": 8,
+        "Process State": "READY",
         "event": 0,
         "io bound": true,
         "io interval": 9,
@@ -31,6 +34,7 @@
     },
     {
         "CPU used": 5,
+        "Process State": "FINISHED",
         "event": 2,
         "io bound": false,
         "io interval": 0,
@@ -41,6 +45,7 @@
     },
     {
         "CPU used": 0,
+        "Process State": "WAITING IO",
         "event": 1,
         "io bound": true,
         "io interval": 9,
@@ -51,6 +56,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": true,
         "io interval": 5,
@@ -61,6 +67,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -71,6 +78,7 @@
     },
     {
         "CPU used": 0,
+        "Process State": "WAITING IO",
         "event": 1,
         "io bound": true,
         "io interval": 5,
@@ -81,6 +89,7 @@
     },
     {
         "CPU used": 8,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -91,6 +100,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -101,6 +111,7 @@
     },
     {
         "CPU used": 12,
+        "Process State": "FINISHED",
         "event": 2,
         "io bound": false,
         "io interval": 0,
@@ -111,6 +122,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -121,6 +133,7 @@
     },
     {
         "CPU used": 8,
+        "Process State": "FINISHED",
         "event": 2,
         "io bound": false,
         "io interval": 0,
@@ -131,6 +144,7 @@
     },
     {
         "CPU used": 8,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -141,6 +155,7 @@
     },
     {
         "CPU used": 12,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -151,6 +166,7 @@
     },
     {
         "CPU used": 16,
+        "Process State": "READY",
         "event": 0,
         "io bound": false,
         "io interval": 0,
@@ -161,6 +177,7 @@
     },
     {
         "CPU used": 19,
+        "Process State": "FINISHED",
         "event": 2,
         "io bound": false,
         "io interval": 0,
@@ -171,6 +188,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": true,
         "io interval": 5,
@@ -181,6 +199,7 @@
     },
     {
         "CPU used": 5,
+        "Process State": "FINISHED",
         "event": 2,
         "io bound": true,
         "io interval": 5,
@@ -191,6 +210,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "READY",
         "event": 0,
         "io bound": true,
         "io interval": 9,
@@ -201,6 +221,7 @@
     },
     {
         "CPU used": 8,
+        "Process State": "READY",
         "event": 0,
         "io bound": true,
         "io interval": 9,
@@ -211,6 +232,7 @@
     },
     {
         "CPU used": 0,
+        "Process State": "WAITING IO",
         "event": 1,
         "io bound": true,
         "io interval": 9,
@@ -221,6 +243,7 @@
     },
     {
         "CPU used": 4,
+        "Process State": "FINISHED",
         "event": 2,
         "io bound": true,
         "io interval": 9,
