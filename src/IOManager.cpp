@@ -25,7 +25,8 @@ void IOManager::updateIO()
 
         if (proc.isWaitingIO() && proc.isIOBound() && proc.getRemainingTime() > 0)
         {
-            proc.startIO();
+            if (proc.getIORemainingTime() == 0)
+                proc.startIO();
         }
     }
 }
@@ -43,8 +44,19 @@ void IOManager::processIO(int timeslice)
         PCB& proc = process_pool[idx];
         if (proc.getIORemainingTime() > 0)
         {
-            proc.setIOTime(std::max(0, proc.getIORemainingTime() - time_diff));
-            proc.incrementTotalIO(std::max(proc.getIORemainingTime() - time_diff, time_diff));
+            int io_time_passed = std::min(proc.getIORemainingTime(), time_diff);
+
+            proc.setIOTime(proc.getIORemainingTime() - io_time_passed);
+
+            if (proc.getIORemainingTime() < 0)  // if it goes to 0 temporarily, clamp it.
+            {
+                proc.setIOTime(0);
+            }
+
+            proc.incrementTotalIO(io_time_passed);
+
+            std::cout << "[IO] PID " << proc.getPid() << " in IO: completed " << io_time_passed << "ms, total IO so far: " << proc.getTotalIOTime() << "ms, remaining: " << proc.getIORemainingTime()
+                      << "ms" << std::endl;
         }
 
         if (proc.getIORemainingTime() <= 0)
@@ -65,7 +77,7 @@ void IOManager::handleIOqueue()
     for (size_t idx : finished_IO)
     {
         PCB& proc = process_pool[idx];
-        proc.resetIO();
+        proc.resetIO();  // sets waiting_IO flag.
     }
 
     // remove all finished process, by detecting waiting_IO flag.

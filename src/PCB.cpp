@@ -65,6 +65,7 @@ void PCB::updateStatesAfterExecution()
     if (remaining_time <= 0)
     {
         PS = ProcessState::FINISHED;  // process is finished executing.
+        total_cpu_used += cpu_used_on_process;
         remaining_time = 0;
     }
 

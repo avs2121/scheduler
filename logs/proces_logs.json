@@ -19,7 +19,7 @@
         "pid": 6,
         "prio": 1,
         "remaining time": 1,
-        "waiting time": 4
+        "waiting time": 0
     },
     {
         "CPU used": 8,
@@ -30,7 +30,7 @@
         "pid": 3,
         "prio": 1,
         "remaining time": 14,
-        "waiting time": 4
+        "waiting time": 0
     },
     {
         "CPU used": 5,
@@ -41,7 +41,7 @@
         "pid": 6,
         "prio": 1,
         "remaining time": 0,
-        "waiting time": 8
+        "waiting time": 0
     },
     {
         "CPU used": 0,
@@ -52,7 +52,7 @@
         "pid": 3,
         "prio": 1,
         "remaining time": 13,
-        "waiting time": 5
+        "waiting time": 0
     },
     {
         "CPU used": 4,
@@ -63,7 +63,7 @@
         "pid": 1,
         "prio": 2,
         "remaining time": 6,
-        "waiting time": 14
+        "waiting time": 0
     },
     {
         "CPU used": 4,
@@ -74,7 +74,7 @@
         "pid": 4,
         "prio": 2,
         "remaining time": 8,
-        "waiting time": 18
+        "waiting time": 0
     },
     {
         "CPU used": 0,
@@ -85,7 +85,7 @@
         "pid": 1,
         "prio": 2,
         "remaining time": 5,
-        "waiting time": 18
+        "waiting time": 0
     },
     {
         "CPU used": 8,
@@ -96,18 +96,7 @@
         "pid": 4,
         "prio": 2,
         "remaining time": 4,
-        "waiting time": 19
-    },
-    {
-        "CPU used": 4,
-        "Process State": "READY",
-        "event": 0,
-        "io bound": false,
-        "io interval": 0,
-        "pid": 2,
-        "prio": 2,
-        "remaining time": 4,
-        "waiting time": 5
+        "waiting time": 0
     },
     {
         "CPU used": 12,
@@ -116,7 +105,7 @@
         "io bound": false,
         "io interval": 0,
         "pid": 4,
-        "prio": 1,
+        "prio": 2,
         "remaining time": 0,
         "waiting time": 0
     },
@@ -126,10 +115,21 @@
         "event": 0,
         "io bound": false,
         "io interval": 0,
+        "pid": 2,
+        "prio": 3,
+        "remaining time": 4,
+        "waiting time": 0
+    },
+    {
+        "CPU used": 4,
+        "Process State": "READY",
+        "event": 0,
+        "io bound": false,
+        "io interval": 0,
         "pid": 5,
-        "prio": 2,
+        "prio": 3,
         "remaining time": 15,
-        "waiting time": 13
+        "waiting time": 0
     },
     {
         "CPU used": 8,
@@ -138,9 +138,9 @@
         "io bound": false,
         "io interval": 0,
         "pid": 2,
-        "prio": 2,
+        "prio": 3,
         "remaining time": 0,
-        "waiting time": 13
+        "waiting time": 0
     },
     {
         "CPU used": 8,
@@ -149,9 +149,9 @@
         "io bound": false,
         "io interval": 0,
         "pid": 5,
-        "prio": 2,
+        "prio": 3,
         "remaining time": 11,
-        "waiting time": 17
+        "waiting time": 0
     },
     {
         "CPU used": 12,
@@ -160,9 +160,9 @@
         "io bound": false,
         "io interval": 0,
         "pid": 5,
-        "prio": 2,
+        "prio": 3,
         "remaining time": 7,
-        "waiting time": 17
+        "waiting time": 0
     },
     {
         "CPU used": 16,
@@ -171,9 +171,9 @@
         "io bound": false,
         "io interval": 0,
         "pid": 5,
-        "prio": 2,
+        "prio": 3,
         "remaining time": 3,
-        "waiting time": 17
+        "waiting time": 0
     },
     {
         "CPU used": 19,
@@ -182,9 +182,9 @@
         "io bound": false,
         "io interval": 0,
         "pid": 5,
-        "prio": 2,
+        "prio": 3,
         "remaining time": 0,
-        "waiting time": 17
+        "waiting time": 0
     },
     {
         "CPU used": 4,

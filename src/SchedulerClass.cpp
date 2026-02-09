@@ -197,6 +197,31 @@ void Scheduler::roundRobin()
                 size_t i = readyQueue[el].pop();
                 PCB& p = process_pool[i];
 
+                //***** calculate time delta *****//
+                int delta = currentTime - lastTime;
+
+                //***** IO Wait Queue management *****//
+                // want to process IO first, for alredy waiting processes
+                if (delta > 0)
+                {
+                    IO_Processes.processIO(delta);
+
+                    // move finished IO processes
+                    const auto& finished = IO_Processes.getFinishedProcesses();
+                    for (size_t idx : finished)
+                    {
+                        PCB& proc = process_pool[idx];
+                        if (proc.getRemainingTime() > 0 && proc.isReady())
+                        {
+                            readyQueue[proc.getPriority()].push(idx);
+                        }
+                    }
+                    if (!finished.empty())
+                    {
+                        IO_Processes.clearFinished();
+                    }
+                }
+
                 //***** Execute process *****//
                 int timeElapsed = p.execute(TIME_QUANTUM);
                 currentTime += timeElapsed;
@@ -209,46 +234,24 @@ void Scheduler::roundRobin()
                           return oss.str();
                       });
 
-                // handle state transitions
+                //***** handle state transitions + Update IO Wait Queue *****//
+
                 if (p.isWaitingIO() && !IO_Processes.containsPID(p.getPid()))
                 {
                     IO_Processes.enqueue(i);
+                    IO_Processes.updateIO();
                 }
 
                 if (p.isReady() && timeElapsed > 0)
                     readyQueue[el].push(i);
 
-                //***** Update aging *****//
-                int delta = currentTime - lastTime;
-                updateQueuesAfterAging(&p, delta);
-
-                //***** Update IO Wait Queue *****//
-
-                IO_Processes.updateIO();
-
-                //***** IO Wait Queue management *****//
-
-                IO_Processes.processIO(delta);
-
-                // move finished IO processes
-                const auto& finished = IO_Processes.getFinishedProcesses();
-                for (size_t idx : finished)
-                {
-                    PCB& proc = process_pool[idx];
-                    if (proc.getRemainingTime() > 0 && proc.isReady())
-                    {
-                        readyQueue[proc.getPriority()].push(idx);
-                    }
-                }
-                if (!finished.empty())
-                {
-                    IO_Processes.clearFinished();
-                }
-
                 if (p.getRemainingTime() <= 0)
                 {
                     p.setCompletionTime(currentTime);
                 }
+
+                //***** Update aging *****//
+                updateQueuesAfterAging(&p, delta);
 
                 lastTime = currentTime;
                 //***** Update logs *****//
@@ -279,40 +282,22 @@ void Scheduler::run()
         switch (curr_state)
         {
             case Process_STATE::READY:
-                debug(EXEC, "In Process_State ready");
+                // debug(EXEC, "In Process_State ready");
                 curr_state = Process_STATE::RUNNING;
                 break;
 
             case Process_STATE::RUNNING:
-                debug(EXEC, "In Process_State Running");
+                // debug(EXEC, "In Process_State Running");
                 priorityScheduling();
                 roundRobin();
                 curr_state = Process_STATE::FINISHED;
                 break;
 
             case Process_STATE::FINISHED:
-                debug(EXEC, "In Process_State finished");
+                // debug(EXEC, "In Process_State finished");
                 SystemMetrics sm{};
                 sm = metrics.calculate(currentTime);
-
-                // clang-format off
-                debug(EXEC,
-                      [&]()
-                      {
-                          std::ostringstream oss;
-                          oss << "Total time: " << sm.total_time 
-                              << "\nTotal processes: " << sm.total_processes 
-                              << "\nAverage response time: " << sm.avg_response_time 
-                              << "\nAverage turnaround time: " << sm.avg_turnaround_time 
-                              << "\nAverage waiting time: " << sm.avg_waiting_time 
-                              << "\nCPU util: " << sm.cpu_utilization
-                              << "\nThroughput: " << sm.throughput;
-                          return oss.str();
-                      });
-                // clang-format
-
                 metrics.writeToFile(logs_name + "_metrics");
-                debug(EXEC, "Finished");
                 finished_flag = true;
                 break;
         }

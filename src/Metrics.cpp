@@ -55,6 +55,8 @@ ProcessMetrics Metrics::calculateProcessMetrics(const PCB& proc) const
     // get process pid
     pm.pid = proc.getPid();
 
+    pm.completion_time = proc.getCompletionTime();
+
     // all processes arrive at 0.
     pm.turnaround_time = proc.getCompletionTime() - 0;
 
@@ -86,24 +88,6 @@ json Metrics::toJson() const
                                  {"total time", cached_metrics.total_time},
                                  {"total processes", cached_metrics.total_processes}},
     summary["process_metrics"] = json::array();
-
-    if (!summary.contains("process_metrics"))
-    {
-        std::cerr << "mistake in naming of process metrics field in json" << std::endl;
-    }
-    else
-    {
-        std::cerr << "EXSITS!!" << std::endl;
-    }
-
-    if (!summary.contains("system_metrics"))
-    {
-        std::cerr << "mistake in naming of system metrics field in json" << std::endl;
-    }
-    else
-    {
-        std::cerr << "EXSITS!!" << std::endl;
-    }
 
     for (const auto& pm : cached_metrics.per_process)
     {
