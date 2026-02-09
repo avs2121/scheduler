@@ -54,9 +54,6 @@ void IOManager::processIO(int timeslice)
             }
 
             proc.incrementTotalIO(io_time_passed);
-
-            std::cout << "[IO] PID " << proc.getPid() << " in IO: completed " << io_time_passed << "ms, total IO so far: " << proc.getTotalIOTime() << "ms, remaining: " << proc.getIORemainingTime()
-                      << "ms" << std::endl;
         }
 
         if (proc.getIORemainingTime() <= 0)

@@ -15,7 +15,7 @@
                 "Completion time": 13,
                 "IO time used": 0,
                 "PID": 6,
-                "Response time": 0,
+                "Response time": 4,
                 "Turnaround time": 13,
                 "Waiting time": 8
             },
@@ -24,7 +24,7 @@
                 "Completion time": 68,
                 "IO time used": 5,
                 "PID": 1,
-                "Response time": 0,
+                "Response time": 14,
                 "Turnaround time": 68,
                 "Waiting time": 53
             },
@@ -33,7 +33,7 @@
                 "Completion time": 31,
                 "IO time used": 0,
                 "PID": 4,
-                "Response time": 0,
+                "Response time": 18,
                 "Turnaround time": 31,
                 "Waiting time": 19
             },
@@ -42,7 +42,7 @@
                 "Completion time": 43,
                 "IO time used": 0,
                 "PID": 2,
-                "Response time": 0,
+                "Response time": 31,
                 "Turnaround time": 43,
                 "Waiting time": 35
             },
@@ -51,13 +51,13 @@
                 "Completion time": 58,
                 "IO time used": 0,
                 "PID": 5,
-                "Response time": 0,
+                "Response time": 35,
                 "Turnaround time": 58,
                 "Waiting time": 39
             }
         ],
         "system_metrics": {
-            "Average response time": 0.0,
+            "Average response time": 17.0,
             "Average turnaround time": 51.166666666666664,
             "Average waiting time": 34.666666666666664,
             "CPU Utilization": 80.85106382978722,

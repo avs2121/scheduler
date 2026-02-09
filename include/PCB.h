@@ -38,7 +38,9 @@ class PCB
     int getCompletionTime() const;
     int getTotalIOTime() const;
     int getTotalCpuUsedTime() const;
+    int getFirstResponseTime() const;
     bool isIOBound() const;
+    bool isFirstResponse() const;
 
     ProcessState getState() const;
     std::string getStringState() const;
@@ -46,6 +48,8 @@ class PCB
     // Setters
     void setState(ProcessState state);
     void setPriority(int prio);
+    void setFirstResponse(bool response);
+    void setFirstTimeResponse(int time);
     void setIOTime(int io_remainingtime);
     void setCompletionTime(int time);
     void incrementTotalIO(int time);
@@ -72,5 +76,7 @@ class PCB
     int total_cpu_used;       // total cpu time used
     int completion_time;      // set this, when process completes. Updates in scheduler
     int total_io_time;        // total time spent in i/o wait. Updates in IOManager
+    int note_first_reponse;   // note the time of the first response for process.
+    bool first_response;      // set this, for first execute cycle on the process
     ProcessState PS;          // Process State
 };

@@ -224,6 +224,12 @@ void Scheduler::roundRobin()
 
                 //***** Execute process *****//
                 int timeElapsed = p.execute(TIME_QUANTUM);
+                if (p.isFirstResponse() == false)  // if its first time executing, set these values.
+                {
+                    p.setFirstResponse(true);
+                    p.setFirstTimeResponse(currentTime);
+                }
+
                 currentTime += timeElapsed;
 
                 debug(EXEC,

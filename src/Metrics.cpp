@@ -2,8 +2,6 @@
 
 #include <LogsJson.h>
 
-#include <iostream>
-
 Metrics::Metrics(std::array<PCB, N>& process_pool) : process_pool(process_pool), metrics_calculated(false)
 {
 }
@@ -66,8 +64,7 @@ ProcessMetrics Metrics::calculateProcessMetrics(const PCB& proc) const
 
     pm.waiting_time = pm.turnaround_time - pm.cpu_time_used - pm.io_time_used;
 
-    // not implemented.
-    pm.response_time = 0;
+    pm.response_time = proc.getFirstResponseTime();
 
     return pm;
 }
