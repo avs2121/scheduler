@@ -5,10 +5,12 @@
 
 int main()
 {
-    setLogDirectory(std::filesystem::path("..") / "logs");
+    auto exe_path = std::filesystem::current_path();
+    setLogDirectory(exe_path / "logs");
 
     Scheduler scheduler("proces_logs");
-    scheduler.setDebugFlags(Scheduler::EXEC | Scheduler::AGING | Scheduler::WARNING);
+
+    scheduler.setDebugFlags(Scheduler::EXEC | Scheduler::WARNING);
 
     std::thread t1([&scheduler]() { scheduler.run(); });
 

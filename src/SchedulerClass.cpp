@@ -87,7 +87,8 @@ void Scheduler::logEvent(PCB* p)
                     {"remaining time", p->getRemainingTime()},
                     {"io bound", p->isIOBound()},
                     {"io interval", p->getIOInterval()},
-                    {"CPU used", p->getCpuUsed()}};
+                    {"CPU used", p->getCpuUsed()},
+                    {"Process State", p->getStringState()}};
 
     eventLog.push_back(j_array);
 }
@@ -294,6 +295,7 @@ void Scheduler::run()
             case Process_STATE::FINISHED:
                 // std::cout << "IN finished state" << std::endl;
 
+                debug(EXEC, "In Process_State finished");
                 SystemMetrics sm{};
                 sm = metrics.calculate(currentTime);
                 metrics.writeToFile(logs_name + "_metrics");

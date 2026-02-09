@@ -64,6 +64,8 @@ ProcessMetrics Metrics::calculateProcessMetrics(const PCB& proc) const
 
     // not implemented.
     pm.response_time = 0;
+
+    return pm;
 }
 
 json Metrics::toJson() const

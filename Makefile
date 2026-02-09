@@ -10,14 +10,14 @@ LOG_DIR = logs
 BIN_PATH = $(BUILD_DIR)/$(BIN_DIR)
 
 #Source files
-SRC = $(SRC_PATH)/SchedulerClass.cpp $(SRC_PATH)/LogsJson.cpp $(SRC_PATH)/PCB.cpp $(SRC_PATH)/IOManager.cpp
+SRC = $(SRC_PATH)/SchedulerClass.cpp $(SRC_PATH)/LogsJson.cpp $(SRC_PATH)/PCB.cpp $(SRC_PATH)/IOManager.cpp $(SRC_PATH)/Metrics.cpp
 MAIN_SRC = $(SRC_PATH)/PriorityScheduler.cpp
 
 #Test files
 TEST_SRC = $(TEST_PATH)/test_main.cpp $(TEST_PATH)/test_scheduler.cpp $(TEST_PATH)/test_pcb.cpp $(TEST_PATH)/test_io.cpp $(TEST_PATH)/TestFixture.cpp
 
 #Include files
-INC = $(INC_PATH)/ReadyQueue.h $(INC_PATH)/SchedulerClass.h $(INC_PATH)/PCB.h $(INC_PATH)/IOManager.h
+INC = $(INC_PATH)/ReadyQueue.h $(INC_PATH)/SchedulerClass.h $(INC_PATH)/PCB.h $(INC_PATH)/IOManager.h $(INC_PATH)/Metrics.h
 TEST_INC = $(TEST_PATH)/TestFixture.h
 
 #Targets
