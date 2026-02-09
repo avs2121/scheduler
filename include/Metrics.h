@@ -7,54 +7,53 @@
 
 using json = nlohmann::json;
 
-// clang-format off
 // right now turnaround and completion is the same, because they all arrive at (0) - same time.
-struct ProcessMetrics {
-  int pid;             // process id
-  int turnaround_time; // total time : completion time - arrival time
-  int waiting_time;  // time in i/o wait : turnaround time - cpu time - io time
-  int response_time; // time from arrival to first execution -> add method to pcb to track this. 
-  int cpu_time_used; // cpu time used on process
-  int io_time_used;  // time spent on i/o operation
-  int completion_time; // time worked on : time from arrival
-};
-// clang-format on 
-
-struct SystemMetrics {
-  double avg_trunaround_time;
-  double avg_waiting_time;
-  double avg_response_time;
-  double cpu_utilization; // (total cpu time / total time) * 100 (for procent)
-  double throughput;      // total processes / total time
-  int total_time;         // total time spent on all processes
-  int total_processes;    // amount of processes
-  std::vector<ProcessMetrics> per_process;
+struct ProcessMetrics
+{
+    int pid;              // process id
+    int turnaround_time;  // total time : completion time - arrival time
+    int waiting_time;     // time in i/o wait : turnaround time - cpu time - io time
+    int response_time;    // time from arrival to first execution -> add method to pcb to track this.
+    int cpu_time_used;    // cpu time used on process
+    int io_time_used;     // time spent in i/o
+    int completion_time;  // time worked on : time from arrival
 };
 
-class Metrics {
-public:
+struct SystemMetrics
+{
+    double avg_trunaround_time;
+    double avg_waiting_time;
+    double avg_response_time;
+    double cpu_utilization;  // (total cpu time / total time) * 100 (for procent)
+    double throughput;       // total processes / total time
+    int total_time;          // total time spent on all processes
+    int total_processes;     // amount of processes
+    std::vector<ProcessMetrics> per_process;
+};
+
+class Metrics
+{
+   public:
     Metrics(std::array<PCB, N * 2>& process_pool);
 
-    //calculate metrics from process pool
-    SystemMetrics calculate(int total_time); 
+    // calculate metrics from process pool
+    SystemMetrics calculate(int total_time);
 
-    //to json format
-    //write to file 
-    json toJson() const; 
-    void writeToFile(const std::string& name) const; 
-    
-    //process metrics
-    ProcessMetrics getProcessMetrics(int pid) const; 
-    double getAvgTurnaroundTime() const; 
-    double getCpuUtilization() const; 
+    // to json format
+    // write to file
+    json toJson() const;
+    void writeToFile(const std::string& name) const;
 
-private:
+    // process metrics
+    ProcessMetrics getProcessMetrics(int pid) const;
+    double getAvgTurnaroundTime() const;
+    double getCpuUtilization() const;
+
+   private:
     const std::array<PCB, N * 2>& process_pool;
-    SystemMetrics cached_metrics; 
-    bool metrics_calculated;   
+    SystemMetrics cached_metrics;
+    bool metrics_calculated;
 
     // private helper methods
-    ProcessMetrics calculateProcessMetrics(const PCB& proc) const; 
-    double calculateCpuUtilization(int total_cpu_time, int total_time) const; 
-    double calculateThroughput(int total_time, int num_processes) const; 
+    ProcessMetrics calculateProcessMetrics(const PCB& proc) const;
 };

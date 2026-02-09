@@ -3,16 +3,16 @@
 #include "LogsJson.h"
 #include "SchedulerClass.h"
 
-int main() {
-  setLogDirectory(std::filesystem::path("..") / "logs");
+int main()
+{
+    setLogDirectory(std::filesystem::path("..") / "logs");
 
-  Scheduler scheduler("proces_logs");
-  scheduler.setDebugFlags(Scheduler::EXEC | Scheduler::AGING |
-                          Scheduler::WARNING);
+    Scheduler scheduler("proces_logs");
+    scheduler.setDebugFlags(Scheduler::EXEC | Scheduler::AGING | Scheduler::WARNING);
 
-  std::thread t1([&scheduler]() { scheduler.run(); });
+    std::thread t1([&scheduler]() { scheduler.run(); });
 
-  t1.join();
+    t1.join();
 
-  return 0;
+    return 0;
 }
