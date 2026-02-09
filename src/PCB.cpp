@@ -13,6 +13,7 @@ PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval) : pid(pid
     this->completion_time = -1;
     this->total_io_time = 0;
     this->first_response = false;
+    this->first_response_time = -1;
     this->PS = ProcessState::READY;
 }
 
@@ -143,7 +144,7 @@ int PCB::getTotalCpuUsedTime() const
 
 int PCB::getFirstResponseTime() const
 {
-    return note_first_reponse;
+    return first_response_time;
 }
 
 ProcessState PCB::getState() const
@@ -193,14 +194,10 @@ void PCB::setPriority(int prio_)
     this->prio = prio_;
 }
 
-void PCB::setFirstResponse(bool response)
+void PCB::recordFirstResponse(int time)
 {
-    this->first_response = response;
-}
-
-void PCB::setFirstTimeResponse(int time)
-{
-    this->note_first_reponse = time;
+    this->first_response = true;
+    this->first_response_time = time;
 }
 
 void PCB::setIOTime(int io_remainingtime_)

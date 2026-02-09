@@ -222,14 +222,14 @@ void Scheduler::roundRobin()
                     }
                 }
 
-                //***** Execute process *****//
-                int timeElapsed = p.execute(TIME_QUANTUM);
-                if (p.isFirstResponse() == false)  // if its first time executing, set these values.
+                //***** To track first response for processes *****//
+                if (p.isFirstResponse() == false)  // if its the process' first time about to execute, set these values.
                 {
-                    p.setFirstResponse(true);
-                    p.setFirstTimeResponse(currentTime);
+                    p.recordFirstResponse(currentTime);
                 }
 
+                //***** Execute process *****//
+                int timeElapsed = p.execute(TIME_QUANTUM);
                 currentTime += timeElapsed;
 
                 debug(EXEC,

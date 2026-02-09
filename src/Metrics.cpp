@@ -64,7 +64,8 @@ ProcessMetrics Metrics::calculateProcessMetrics(const PCB& proc) const
 
     pm.waiting_time = pm.turnaround_time - pm.cpu_time_used - pm.io_time_used;
 
-    pm.response_time = proc.getFirstResponseTime();
+    // arrives at 0, so just get response time
+    pm.response_time = proc.getFirstResponseTime() - 0;
 
     return pm;
 }

@@ -13,7 +13,7 @@ struct ProcessMetrics
     int pid;              // process id
     int turnaround_time;  // total time : completion time - arrival time
     int waiting_time;     // time in i/o wait : turnaround time - cpu time - io time
-    int response_time;    // time from arrival to first execution -> add method to pcb to track this.
+    int response_time;    // time from arrival to first execution : response time - arrival time
     int cpu_time_used;    // cpu time used on process
     int io_time_used;     // time spent in i/o
     int completion_time;  // time worked on : time from arrival
