@@ -1,6 +1,8 @@
 #include "ConfigLoader.h"
 
+#include <algorithm>
 #include <fstream>
+#include <set>
 
 ConfigLoader::ConfigLoader(std::string& config_file) : config_file(config_file)
 {
@@ -57,16 +59,69 @@ SchedulerConfig ConfigLoader::getSchedulerConfig() const
 
 bool ConfigLoader::validate() const
 {
-    // call validate schedulerconfig
-    // call validate processconfig
+    validateSchedulerConfig();
+    validateSchedulerConfig();
+
+    return true;
 }
 
+// validate the required scheduler config numbers are inside the demands
 void ConfigLoader::validateSchedulerConfig() const
 {
-    // validate the required numbers are inside the demands
+    if (!config_data.contains("scheduler_config"))
+    {
+        throw std::runtime_error("Error in scheduler config - missing scheduler_config");
+    }
+
+    auto sched = config_data["scheduler_config"];
+    if (sched["time_quantum"] <= 0)
+    {
+        throw std::runtime_error("Error in time_quantum in scheduler config");
+    }
+
+    if (sched["max_priority"] > 10 || sched["max_priority"] <= 0)
+    {
+        throw std::runtime_error("Error in max_priority in scheduler config");
+    }
+
+    if (sched["aging_threshold"] <= 0)
+    {
+        throw std::runtime_error("Error in aging_threshold in scheduler config");
+    }
 }
 
+// validate process config for e.g no duplicate pids
 void ConfigLoader::validateProcessConfig() const
 {
-    // validate no duplicate pids
+    if (!config_data.contains("processes"))
+    {
+        throw std::runtime_error("Error in process config - missing process array");
+    }
+
+    if (!config_data.empty())
+    {
+        throw std::runtime_error("Error in process config - empty process array");
+    }
+
+    std::vector<ProcessConfig> vector_conf = getProcessConfig();
+    auto sched = config_data["processes"];
+
+    std::set<int> processSet;
+
+    auto it = std::find_if(std::begin(vector_conf),
+                           std::end(vector_conf),
+                           [&processSet](const ProcessConfig& p)
+                           {
+                               if (processSet.find(p.pid) != processSet.end())
+                                   return true;
+
+                               else
+                                   processSet.insert(p.pid);
+                               return false;
+                           });
+
+    if (it != vector_conf.end())
+    {
+        throw std::runtime_error("Duplicate PID found: " + std::to_string(it->pid));
+    }
 }
