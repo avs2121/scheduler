@@ -108,6 +108,14 @@ void ConfigLoader::validateProcessConfig() const
 
     std::set<int> processSet;
 
+    /* lidt lambda teknik, for sjov.
+
+    - I realiteten behøves kun, fordi set ikke kan have duplicates, og dernæst kan size tjekkes:
+    for(auto& p : vector_conf){
+        processSet.insert(p.pid);
+    }
+
+    */
     auto it = std::find_if(std::begin(vector_conf),
                            std::end(vector_conf),
                            [&processSet](const ProcessConfig& p)
