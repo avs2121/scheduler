@@ -1,7 +1,5 @@
 #include "LogsJson.h"
 
-#include <stdint.h>
-
 #include <fstream>
 #include <iostream>
 

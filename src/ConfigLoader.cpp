@@ -1,8 +1,11 @@
 #include "ConfigLoader.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <set>
+
+static std::filesystem::path LOG_DIR = "logs";
 
 ConfigLoader::ConfigLoader(std::string& config_file) : config_file(config_file)
 {
@@ -15,7 +18,7 @@ ConfigLoader::ConfigLoader(std::string& config_file) : config_file(config_file)
 
 void ConfigLoader::loadFromFile()
 {
-    std::ifstream file(config_file);
+    std::ifstream file(LOG_DIR / config_file);
     if (!file.is_open())
     {
         throw std::runtime_error("Error opening file: " + config_file);
@@ -110,7 +113,7 @@ void ConfigLoader::validateProcessConfig() const
 
     /* lidt lambda teknik, for sjov.
 
-    - I realiteten behøves kun, fordi set ikke kan have duplicates, og dernæst kan size tjekkes:
+    - I realiteten behøves kun nedenstående, fordi set ikke kan have duplicates, og dernæst kan size tjekkes:
     for(auto& p : vector_conf){
         processSet.insert(p.pid);
     }
