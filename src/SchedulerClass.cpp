@@ -81,7 +81,7 @@ void Scheduler::flushLogs()
 {
     for (auto& e : eventLog)
     {
-        appendToJSON(logs_name, e);
+        appendToJSON_array(logs_name, e);
     }
 }
 

@@ -103,7 +103,7 @@ void Metrics::writeToFile(const std::string& name) const
 {
     json summary = toJson();
     createJSON(name);
-    appendToJSON(name, summary);
+    appendToJSON_array(name, summary);
 }
 
 // return specific process metrics from pid

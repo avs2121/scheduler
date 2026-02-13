@@ -36,11 +36,6 @@ class Scheduler
     bool isDebugEnabled(DebugLevel level) const;
     int getDebugLevel() const;
 
-    // Time tracking -> Not implemented properly.
-    void findWaitTime();
-    void findTurnaroundTime();
-    void findResponseTime();
-
     // Queue handler
     void updateQueuesAfterAging(PCB* p, int& time_slice);
 

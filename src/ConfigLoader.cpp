@@ -3,7 +3,10 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <set>
+
+#include "LogsJson.h"
 
 static std::filesystem::path LOG_DIR = "logs";
 
@@ -18,7 +21,7 @@ ConfigLoader::ConfigLoader(std::string& config_file) : config_file(config_file)
 
 void ConfigLoader::loadFromFile()
 {
-    std::ifstream file(LOG_DIR / config_file);
+    std::ifstream file(LOG_DIR / extensionJSON(config_file));
     if (!file.is_open())
     {
         throw std::runtime_error("Error opening file: " + config_file);
@@ -26,8 +29,7 @@ void ConfigLoader::loadFromFile()
 
     std::stringstream buffer;
     buffer << file.rdbuf();
-
-    auto config_data = json::parse(buffer.str());
+    config_data = json::parse(buffer.str());
 }
 
 std::vector<ProcessConfig> ConfigLoader::getProcessConfig() const
@@ -39,7 +41,7 @@ std::vector<ProcessConfig> ConfigLoader::getProcessConfig() const
         ProcessConfig proc;
         proc.pid = i["pid"];
         proc.priority = i["priority"];
-        proc.burst = i["burst"];
+        proc.burst = i["burst_time"];
         proc.io_bound = i["io_bound"];
         proc.io_interval = i["io_interval"];
         vector_conf.push_back(proc);
