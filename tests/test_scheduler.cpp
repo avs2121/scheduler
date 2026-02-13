@@ -1,3 +1,5 @@
+#include <LogsJson.h>
+
 #include "SchedulerClass.h"
 #include "TestFixture.h"
 
@@ -10,11 +12,11 @@ class SchedulerConstructionTest : public TestFixture
 
     void test()
     {
-        std::string logfile = "test_construction.json";
+        std::string logfile = "test_construction";
         trackFile(logfile);
 
         Scheduler schedule(logfile);
-        assert_true(fileExists(logfile), "Logfile should exist");
+        assert_true(fileExists(logfile), "Logfile doesnt exist");
     }
 };
 
@@ -27,7 +29,7 @@ class SchedulerDebugTest : public TestFixture
 
     void test()
     {
-        std::string logfile = "debug_test.json";
+        std::string logfile = "debug_test";
         trackFile(logfile);
         Scheduler scheduler(logfile);
 
@@ -51,12 +53,12 @@ class SchedulerFullRunTest : public TestFixture
 
     void test()
     {
-        std::string logfile = "full_test.json";
+        std::string logfile = "full_test";
         trackFile(logfile);
         Scheduler scheduler(logfile);
 
         scheduler.run();
-        assert_true(fileExists(logfile), "Log file exists");
+        assert_true(fileExists(logfile), "Log file doesnt exists");
         assert_true(countLines(logfile) > 0, "Log file contains lines");
     }
 };

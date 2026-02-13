@@ -9,24 +9,8 @@
 
 Scheduler::Scheduler(std::string logs_name) : IO_Processes(process_pool), metrics(process_pool), logs_name(logs_name)
 {
+    this->logs_name = std::filesystem::path(logs_name).stem().string();
     createJSON(logs_name);
-}
-
-// time spent in ready queue
-void Scheduler::findWaitTime()
-{
-}
-
-// total time from submission to completion
-void Scheduler::findTurnaroundTime()
-{
-    //
-}
-
-// time from submission to first reponse
-void Scheduler::findResponseTime()
-{
-    //
 }
 
 void Scheduler::priorityScheduling()

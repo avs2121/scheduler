@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include "LogsJson.h"
+
 static std::filesystem::path LOG_DIR = "logs";
 
 TestFixture::TestFixture(const std::string& testname) : testname(testname)
@@ -46,15 +48,16 @@ void TestFixture::assert_equal(int actual, int expected, const std::string& mess
 
 bool TestFixture::fileExists(const std::string& filename)
 {
-    std::ifstream file(filename);
-    return file.good();
+    // std::ifstream file(LOG_DIR / filename);
+    // return file.good();
+    return std::filesystem::exists(makeLogPath(filename));
 }
 
 int TestFixture::countLines(std::string& filename)
 {
     int number_of_lines = 0;
     std::string line;
-    std::ifstream file(LOG_DIR / filename);
+    std::ifstream file(LOG_DIR / extensionJSON(filename));
 
     while (std::getline(file, line))
     {
