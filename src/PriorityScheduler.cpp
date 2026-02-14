@@ -8,13 +8,15 @@ int main()
     auto exe_path = std::filesystem::current_path();
     setLogDirectory(exe_path / "logs");
 
-    auto config_path = std::filesystem::current_path();
-    std::string config_file;
-    config_file += config_path.string() + "/config" + "/process_config.json";
+    // make use of the /= operator, for portability to other platforms.
+    auto config_path = std::filesystem::current_path() / "config" / "process_config.json";
 
-    std::cout << config_file << std::endl;
+    if (!std::filesystem::exists(config_path))
+    {
+        throw std::runtime_error("Config file doesnt exist at the provided path: " + config_path.string());
+    }
 
-    Scheduler scheduler("proces_logs", config_file);
+    Scheduler scheduler("proces_logs", config_path.string());
 
     scheduler.setDebugFlags(Scheduler::EXEC | Scheduler::WARNING);
 

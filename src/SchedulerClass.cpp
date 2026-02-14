@@ -29,10 +29,12 @@ void Scheduler::loadConfig(std::string config_file)
         throw std::runtime_error("To many processes, the maximum size is: " + std::to_string(MAX_PROCESS_SIZE));
     }
 
-    for (size_t i = 0; i < proc_conf.size(); i++)
+    process_pool.clear();
+    process_pool.reserve(proc_conf.size());  // optional, but avoids re-allocs.
+
+    for (const auto& pc : proc_conf)
     {
-        const auto& pc = proc_conf[i];
-        process_pool[i] = PCB(pc.pid, pc.priority, pc.burst, pc.io_bound, pc.io_interval, aging_threshold, time_quantum);
+        process_pool.emplace_back(pc.pid, pc.priority, pc.burst, pc.io_bound, pc.io_interval, aging_threshold, time_quantum);
     }
 
     IO_Processes.emplace(process_pool);
