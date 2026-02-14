@@ -7,6 +7,8 @@ A multilevel feedback queue scheduler with priority aging and I/O handling.
 make              # Build everything
 make test         # Run tests
 make run          # Run scheduler
+make clean-logs   # Remove log-files
+make help         # Show list of targets
 ```
 
 ## Configuration
