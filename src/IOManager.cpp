@@ -1,11 +1,10 @@
 #include "IOManager.h"
 
 #include <algorithm>
-#include <array>
 #include <climits>
 #include <iostream>
 
-IOManager::IOManager(std::array<PCB, N>& process_pool) : process_pool(process_pool)
+IOManager::IOManager(std::vector<PCB>& process_pool) : process_pool(process_pool)
 {
 }
 
