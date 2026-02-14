@@ -82,9 +82,16 @@ void Scheduler::updateQueuesAfterAging(PCB* p, int& time_slice)
     */
 
     // clang-format off
+    
+    /*
+    The above style is the clearly favored style, because it is way easier to understand. There is a lof of nested conditionals, 
+    and modifications during the loops, therefore ranges and views, should probably not be prefered. 
+    It is though, because i wanted to practice them. Therefore the above, out-commented code is kept. 
+    */
 
     std::vector<size_t> aged_processes;
-    // først brug std::views::iota for a iterate over index range, og udføre checks
+    
+    //  First use std::views with iota, for iterating over all the processes in the pool, and do the necessary checks. 
     auto idx_range = std::views::iota((size_t)0, process_pool.size())  |  
     std::views::filter([&](size_t idx){PCB& proc = process_pool[idx]; 
         return proc.getRemainingTime() > 0 && 
@@ -92,12 +99,12 @@ void Scheduler::updateQueuesAfterAging(PCB* p, int& time_slice)
         !proc.isWaitingIO() && 
         readyQueue[proc.getPriority()].contains(idx); });
 
-    // dernæst kør efterfølgende if statement, med for_each range statement
+    // For the processes ful-filling the previous conditionals, use ranges to iterate over each and age. 
     std::ranges::for_each(idx_range, ([&] (size_t idx) {
         if(process_pool[idx].ageProcess(time_slice))
             aged_processes.push_back(idx);}));
 
-
+    // Use ranges on each element that fulfilled previous conditionals, to update their priority. 
     std::ranges::for_each(aged_processes, [&](size_t idx) {
         readyQueue[process_pool[idx].getOldPriority()].remove(idx);
         readyQueue[process_pool[idx].getPriority()].push(idx);
