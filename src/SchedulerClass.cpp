@@ -1,5 +1,6 @@
 #include "SchedulerClass.h"
 
+#include <ranges>
 #include <sstream>
 
 #include "IOManager.h"
@@ -56,10 +57,14 @@ void Scheduler::updateQueuesAfterAging(PCB* p, int& time_slice)
 {
     //***** Update aging *****//
     // phase 1 - find aged processes, and store them in vector
+    /* clang-format off
     std::vector<size_t> aged_processes;
     for (size_t idx = 0; idx < process_pool.size(); idx++)
     {
-        if (process_pool[idx].getRemainingTime() > 0 && process_pool[idx].getPid() != p->getPid() && !process_pool[idx].isWaitingIO() && readyQueue[process_pool[idx].getPriority()].contains(idx))
+        if (process_pool[idx].getRemainingTime() > 0 && 
+            process_pool[idx].getPid() != p->getPid() && 
+            !process_pool[idx].isWaitingIO() && 
+            readyQueue[process_pool[idx].getPriority()].contains(idx))
         {
             if (process_pool[idx].ageProcess(time_slice))
             {
@@ -67,12 +72,38 @@ void Scheduler::updateQueuesAfterAging(PCB* p, int& time_slice)
             }
         }
     }
+
     // phase 2 - remove and push the aged processes, to appropriate queues.
     for (auto id : aged_processes)
     {
         readyQueue[process_pool[id].getOldPriority()].remove(id);
         readyQueue[process_pool[id].getPriority()].push(id);
     }
+    */
+
+    // clang-format off
+
+    std::vector<size_t> aged_processes;
+    // først brug std::views::iota for a iterate over index range, og udføre checks
+    auto idx_range = std::views::iota((size_t)0, process_pool.size())  |  
+    std::views::filter([&](size_t idx){PCB& proc = process_pool[idx]; 
+        return proc.getRemainingTime() > 0 && 
+        (proc.getPid() != p->getPid()) && 
+        !proc.isWaitingIO() && 
+        readyQueue[proc.getPriority()].contains(idx); });
+
+    // dernæst kør efterfølgende if statement, med for_each range statement
+    std::ranges::for_each(idx_range, ([&] (size_t idx) {
+        if(process_pool[idx].ageProcess(time_slice))
+            aged_processes.push_back(idx);}));
+
+
+    std::ranges::for_each(aged_processes, [&](size_t idx) {
+        readyQueue[process_pool[idx].getOldPriority()].remove(idx);
+        readyQueue[process_pool[idx].getPriority()].push(idx);
+    });
+
+    // clang-format on
 }
 
 void Scheduler::logEvent(PCB* p)
