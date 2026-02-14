@@ -34,7 +34,7 @@ struct SystemMetrics
 class Metrics
 {
    public:
-    Metrics(std::array<PCB, N>& process_pool);
+    Metrics(std::vector<PCB>& process_pool);
 
     // calculate metrics from process pool
     SystemMetrics calculate(int total_time);
@@ -50,7 +50,7 @@ class Metrics
     double getCpuUtilization() const;
 
    private:
-    const std::array<PCB, N>& process_pool;
+    const std::vector<PCB>& process_pool;
     SystemMetrics cached_metrics;
     bool metrics_calculated;
 

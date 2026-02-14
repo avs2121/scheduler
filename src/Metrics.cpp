@@ -2,7 +2,7 @@
 
 #include <LogsJson.h>
 
-Metrics::Metrics(std::array<PCB, N>& process_pool) : process_pool(process_pool), metrics_calculated(false)
+Metrics::Metrics(std::vector<PCB>& process_pool) : process_pool(process_pool), metrics_calculated(false)
 {
 }
 
@@ -14,7 +14,7 @@ SystemMetrics Metrics::calculate(int total_time)
     // set cached_metrics to the metrics before returning the metrics.
 
     metrics.total_time = total_time;
-    metrics.total_processes = N;
+    metrics.total_processes = process_pool.size();
 
     int total_turnaround_time = 0;
     int total_waiting_time = 0;
@@ -32,11 +32,11 @@ SystemMetrics Metrics::calculate(int total_time)
         metrics.per_process.push_back(pm);
     }
 
-    metrics.avg_turnaround_time = static_cast<double>(total_turnaround_time) / N;
-    metrics.avg_waiting_time = static_cast<double>(total_waiting_time) / N;
-    metrics.avg_response_time = static_cast<double>(total_response_time) / N;
+    metrics.avg_turnaround_time = static_cast<double>(total_turnaround_time) / metrics.total_processes;
+    metrics.avg_waiting_time = static_cast<double>(total_waiting_time) / metrics.total_processes;
+    metrics.avg_response_time = static_cast<double>(total_response_time) / metrics.total_processes;
     metrics.cpu_utilization = (static_cast<double>(total_cpu_time) / total_time) * 100;
-    metrics.throughput = static_cast<double>(N) / total_time;
+    metrics.throughput = static_cast<double>(metrics.total_processes) / total_time;
 
     cached_metrics = metrics;
     metrics_calculated = true;

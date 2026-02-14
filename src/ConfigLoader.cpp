@@ -10,7 +10,7 @@
 
 static std::filesystem::path LOG_DIR = "logs";
 
-ConfigLoader::ConfigLoader(std::string& config_file) : config_file(config_file)
+ConfigLoader::ConfigLoader(const std::string& config_file) : config_file(config_file)
 {
     loadFromFile();
     if (!validate())
