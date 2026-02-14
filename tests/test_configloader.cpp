@@ -147,9 +147,9 @@ class ConfigLoaderGetSchedulerConfig : public TestFixture
         ConfigLoader cf(logfile);
 
         SchedulerConfig getScheduler = cf.getSchedulerConfig();
-        assert_equal(testconf_sched.aging_threshold, getScheduler.aging_threshold, "Aging threshold should be equal");
-        assert_equal(testconf_sched.max_priority, getScheduler.max_priority, "Max priority should be equal");
-        assert_equal(testconf_sched.time_quantum, getScheduler.time_quantum, "Time quantum should be equal");
+        assert_equal(testconf_sched.aging_threshold, getScheduler.aging_threshold.value(), "Aging threshold should be equal");
+        assert_equal(testconf_sched.max_priority, getScheduler.max_priority.value(), "Max priority should be equal");
+        assert_equal(testconf_sched.time_quantum, getScheduler.time_quantum.value(), "Time quantum should be equal");
     }
 };
 

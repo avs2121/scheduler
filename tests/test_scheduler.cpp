@@ -3,6 +3,8 @@
 #include "SchedulerClass.h"
 #include "TestFixture.h"
 
+const auto config_path = std::filesystem::current_path() / "config" / "process_config.json";
+
 class SchedulerConstructionTest : public TestFixture
 {
    public:
@@ -15,7 +17,9 @@ class SchedulerConstructionTest : public TestFixture
         std::string logfile = "test_construction";
         trackFile(logfile);
 
-        Scheduler schedule(logfile);
+        assert_true(std::filesystem::exists(config_path), "Config path must exist");
+
+        Scheduler schedule(logfile, config_path.string());
         assert_true(fileExists(logfile), "Logfile doesnt exist");
     }
 };
@@ -31,7 +35,10 @@ class SchedulerDebugTest : public TestFixture
     {
         std::string logfile = "debug_test";
         trackFile(logfile);
-        Scheduler scheduler(logfile);
+
+        assert_true(std::filesystem::exists(config_path), "Config path must exist");
+
+        Scheduler scheduler(logfile, config_path.string());
 
         scheduler.enableDebug(Scheduler::EXEC);
         assert_true(scheduler.isDebugEnabled(Scheduler::EXEC), "Debug should be enabled");
@@ -55,7 +62,10 @@ class SchedulerFullRunTest : public TestFixture
     {
         std::string logfile = "full_test";
         trackFile(logfile);
-        Scheduler scheduler(logfile);
+
+        assert_true(std::filesystem::exists(config_path), "Config path must exist");
+
+        Scheduler scheduler(logfile, config_path.string());
 
         scheduler.run();
         assert_true(fileExists(logfile), "Log file doesnt exists");

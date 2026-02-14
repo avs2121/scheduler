@@ -13,6 +13,9 @@ Test funktion sidst
 
 */
 
+const int TEST_AGING = 5;
+const int TEST_TIME = 4;
+
 class IOEnqueueTest : public TestFixture
 {
    public:
@@ -23,13 +26,13 @@ class IOEnqueueTest : public TestFixture
     void test()
     {
         // clang-format off
-    std::array<PCB, N> process = {
-        PCB(1, 1, 5, 1, 2),
-        PCB(2, 1, 5, 1, 2), 
-        PCB(3, 1, 5, 1, 2),
-        PCB(4, 1, 5, 1, 2), 
-        PCB(5, 1, 5, 1, 2),
-        PCB(6, 1,   5, 1, 2),
+    std::vector<PCB> process = {
+        PCB(1, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(2, 1, 5, 1, 2, TEST_AGING, TEST_TIME), 
+        PCB(3, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(4, 1, 5, 1, 2, TEST_AGING, TEST_TIME), 
+        PCB(5, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(6, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
     };
         // clang-format on
 
@@ -56,13 +59,13 @@ class IOUpdateTest : public TestFixture
     void test()
     {
         // clang-format off
-    std::array<PCB, N> process = {
-        PCB(1, 1, 5, 1, 2),
-        PCB(2, 1, 5, 1, 2), 
-        PCB(3, 1, 5, 1, 2),
-        PCB(4, 1, 5, 1, 2), 
-        PCB(5, 1, 5, 1, 2),
-        PCB(6, 1, 5, 1, 2),
+    std::vector<PCB> process = {
+         PCB(1, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(2, 1, 5, 1, 2, TEST_AGING, TEST_TIME), 
+        PCB(3, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(4, 1, 5, 1, 2, TEST_AGING, TEST_TIME), 
+        PCB(5, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(6, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
     };
         // clang-format on
 
@@ -108,13 +111,13 @@ class IOProcessTest : public TestFixture
     void test()
     {
         // clang-format off
-    std::array<PCB, N> process = {
-        PCB(1, 1, 10, 1, 13),
-        PCB(2, 1, 3, 1, 2), 
-        PCB(3, 1, 3, 1, 2),
-        PCB(4, 1, 5, 1, 2), 
-        PCB(5, 1, 5, 1, 2),
-        PCB(6, 1, 5, 1, 2),
+    std::vector<PCB> process = {
+        PCB(1, 1, 10, 1, 13, TEST_AGING, TEST_TIME),
+        PCB(2, 1, 3, 1, 2, TEST_AGING, TEST_TIME), 
+        PCB(3, 1, 3, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(4, 1, 5, 1, 2, TEST_AGING, TEST_TIME), 
+        PCB(5, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
+        PCB(6, 1, 5, 1, 2, TEST_AGING, TEST_TIME),
     };
         // clang-format on
 
@@ -137,7 +140,7 @@ class IOProcessTest : public TestFixture
 
         iom.updateIO();
 
-        iom.processIO(TIME_QUANTUM);
+        iom.processIO(TEST_TIME);
         const std::vector<size_t>& finished_processes_test = iom.getFinishedProcesses();
 
         assert_equal(finished_processes_test.size(), 2, " Finished process size should be 2");
