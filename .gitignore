@@ -36,3 +36,7 @@ Funktioner.txt
 
 # cache directories 
 .cache/
+
+# logs 
+logs/*.json
+!logs/.gitkeep
