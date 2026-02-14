@@ -1,21 +1,20 @@
 #pragma once
-#include <array>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <vector>
 
+#include "ConfigLoader.h"
 #include "IOManager.h"
 #include "LogsJson.h"
 #include "Metrics.h"
 #include "PCB.h"
 #include "ReadyQueue.h"
 
-constexpr int MAX_PRIORITY = 3;
-
 class Scheduler
 {
    public:
-    Scheduler(std::string logs_name);
+    Scheduler(std::string logs_name, std::string config_file);
 
     // Debug logger
     enum DebugLevel
@@ -36,11 +35,6 @@ class Scheduler
     bool isDebugEnabled(DebugLevel level) const;
     int getDebugLevel() const;
 
-    // Time tracking -> Not implemented properly.
-    void findWaitTime();
-    void findTurnaroundTime();
-    void findResponseTime();
-
     // Queue handler
     void updateQueuesAfterAging(PCB* p, int& time_slice);
 
@@ -52,6 +46,9 @@ class Scheduler
     void priorityScheduling();
     bool cleanUpQueues(int& currentTime, int& lastTime);
     void roundRobin();
+
+    // load config
+    void loadConfig(std::string config_file);
 
     // Statemachine
     void run();
@@ -90,22 +87,29 @@ class Scheduler
     size_t pidToIndex(int pid) const;
     int indexToPid(size_t idx) const;
 
-    // clang-format off
-  std::array<PCB, N> process_pool = {
-      PCB(1, 2, 10, 1, 5),
-      PCB(2, 3, 8, 0, 0),
-      PCB(3, 1, 22, 1, 9),
-      PCB(4, 2, 12, 0, 0),
-      PCB(5, 3, 19, 0, 0),
-      PCB(6, 1, 5, 0, 0),
-  };
-    // clang-format on
+    // hold the loaded processes
+    std::vector<PCB> process_pool;
 
     int currentTime;
-    std::array<ReadyQueue<size_t, N * 2>, MAX_PRIORITY + 1> readyQueue;
-    IOManager IO_Processes;
-    Metrics metrics;
+
+    static constexpr int MAX_PROCESS_SIZE = 100;
+    std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>> readyQueue;
+    std::optional<IOManager> IO_Processes;
+    std::optional<Metrics> metrics;
 
     std::string logs_name;
     std::vector<json> eventLog;  // store json objects for logging
+
+    std::string config_file;
+    ConfigLoader loader;
+    SchedulerConfig sched_conf;
+    std::vector<ProcessConfig> proc_conf;
+
+    int time_quantum;
+    int aging_threshold;
+    int max_priority;
+
+    static constexpr int DEFAULT_TIME_QUANTUM = 4;
+    static constexpr int DEFAULT_AGING_THRESHOLD = 5;
+    static constexpr int DEFAULT_MAX_PRIORITY = 3;
 };

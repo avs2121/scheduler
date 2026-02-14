@@ -7,7 +7,7 @@
 class IOManager
 {
    public:
-    IOManager(std::array<PCB, N>& process_pool);
+    IOManager(std::vector<PCB>& process_pool);
 
     void enqueue(size_t idx);
     void updateIO();
@@ -28,7 +28,7 @@ class IOManager
     void printQueue() const;
 
    private:
-    std::array<PCB, N>& process_pool;
+    std::vector<PCB>& process_pool;
     std::deque<size_t> IO_queue;
     std::vector<size_t> finished_IO;
 };

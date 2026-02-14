@@ -1,10 +1,6 @@
 #pragma once
 #include <ostream>
 
-constexpr int TIME_QUANTUM = 4;
-constexpr int AGING_THRESHOLD = 5;
-constexpr int N = 6;
-
 enum class ProcessState
 {
     READY = 0,
@@ -18,7 +14,7 @@ class PCB
     friend std::ostream& operator<<(std::ostream& out, const PCB& p);
 
    public:
-    PCB(int pid, int prio, int burst, bool io_bound, int io_interval);
+    PCB(int pid, int prio, int burst, bool io_bound, int io_interval, int aging_threshold, int time_quantum);
 
     int execute(int timeslice);
     int computeExecuteTime(int timeslice);
@@ -78,4 +74,8 @@ class PCB
     int first_response_time;  // note the time of the first response for process.
     bool first_response;      // set this, for first execute cycle on the process
     ProcessState PS;          // Process State
+
+    // scheduler config
+    int pcb_aging_t;
+    int pcb_time_q;
 };

@@ -1,7 +1,5 @@
 #include "LogsJson.h"
 
-#include <stdint.h>
-
 #include <fstream>
 #include <iostream>
 
@@ -40,7 +38,7 @@ std::string extensionJSON(const std::string& filename)
 }
 
 // Append new JSON object to a JSON array in file
-void appendToJSON(const std::string& filename, const json& entry)
+void appendToJSON_array(const std::string& filename, const json& entry)
 {
     fs::path fullname = makeLogPath(filename);
     json json_arr;
@@ -85,6 +83,21 @@ void appendToJSON(const std::string& filename, const json& entry)
     }
     out << json_arr.dump(4);  // pretty print (4 times indented)
     out.close();              // close the file.
+}
+
+// just appends the objects. Doesnt make it into arrays.
+void appendToJSON_object(const std::string& filename, const json& entry)
+{
+    fs::path fullname = makeLogPath(filename);
+
+    std::ofstream out(fullname,
+                      std::ios::trunc);  // open file to write (overwrite)
+    if (!out.is_open())
+    {
+        std::cerr << "Could not open: " << fullname << "for writing\n";
+        return;
+    }
+    out << entry.dump(4);  // pretty print (4 times indented)
 }
 
 void createJSON(const std::string& filename)

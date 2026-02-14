@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval) : pid(pid), prio(prio), burst_time(burst), io_bound(io_bound), io_interval(io_interval)
+PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval, int aging_threshold, int time_quantum) : pid(pid), prio(prio), burst_time(burst), io_bound(io_bound), io_interval(io_interval)
 {
     this->old_prio = prio;
     this->remaining_time = burst;
@@ -15,6 +15,9 @@ PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval) : pid(pid
     this->first_response = false;
     this->first_response_time = -1;
     this->PS = ProcessState::READY;
+
+    this->pcb_aging_t = aging_threshold;
+    this->pcb_time_q = time_quantum;
 }
 
 int PCB::execute(int timeslice)
@@ -52,7 +55,7 @@ bool PCB::ageProcess(int timediff)
     waiting_time += timediff;
 
     // Aging threshold proportional with time quantum. (5 * 4)
-    if (waiting_time >= AGING_THRESHOLD * TIME_QUANTUM && prio > 1)
+    if (waiting_time >= pcb_aging_t * pcb_time_q && prio > 1)
     {
         old_prio = prio;
         prio--;
