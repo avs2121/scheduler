@@ -113,5 +113,6 @@ void run_scheduler_tests()
         std::cout << "Exception raised in [FULL RUN TEST] with: " << e.what() << std::endl;
         failed++;
     }
-    std::cout << "Scheduler test passed with: " << passed << " passed , " << failed << " failed" << std::endl;
+    std::cout << "Scheduler test passed with: " << passed << " passed , " << failed << " failed"
+              << std::endl;
 }

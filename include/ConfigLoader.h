@@ -11,7 +11,8 @@ static constexpr int DEFAULT_AGING_THRESHOLD = 5;
 static constexpr int DEFAULT_MAX_PRIORITY = 3;
 
 /* ScheduleConfig struct
-    Values can be provided for specific implementation. If not provided, will default to pre-set values.
+    Values can be provided for specific implementation. If not provided, will default to pre-set
+   values.
     -> Therefore not requirement to provide these.
 */
 struct SchedulerConfig

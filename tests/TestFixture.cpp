@@ -42,7 +42,8 @@ void TestFixture::assert_equal(int actual, int expected, const std::string& mess
 {
     if (expected != actual)
     {
-        throw std::runtime_error("Assertion failed. Actual: " + std::to_string(actual) + " Expected: " + std::to_string(expected) + message);
+        throw std::runtime_error("Assertion failed. Actual: " + std::to_string(actual) +
+                                 " Expected: " + std::to_string(expected) + message);
     }
 }
 

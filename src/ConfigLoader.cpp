@@ -131,9 +131,8 @@ void ConfigLoader::validateProcessConfig() const
 
     /* lidt lambda teknik, for sjov.
 
-    - I realiteten behøves kun nedenstående, fordi set ikke kan have duplicates, og dernæst kan size tjekkes:
-    for(auto& p : vector_conf){
-        processSet.insert(p.pid);
+    - I realiteten behøves kun nedenstående, fordi set ikke kan have duplicates, og dernæst kan size
+    tjekkes: for(auto& p : vector_conf){ processSet.insert(p.pid);
     }
 
     */

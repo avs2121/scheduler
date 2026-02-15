@@ -77,7 +77,10 @@ void IOManager::handleIOqueue()
     }
 
     // remove all finished process, by detecting waiting_IO flag.
-    IO_queue.erase(std::remove_if(IO_queue.begin(), IO_queue.end(), [&](size_t idx) { return !(process_pool[idx].isWaitingIO()); }), IO_queue.end());
+    IO_queue.erase(std::remove_if(IO_queue.begin(),
+                                  IO_queue.end(),
+                                  [&](size_t idx) { return !(process_pool[idx].isWaitingIO()); }),
+                   IO_queue.end());
 }
 
 const std::vector<size_t>& IOManager::getFinishedProcesses() const
@@ -97,7 +100,9 @@ size_t IOManager::size() const
 
 bool IOManager::containsPID(int pid) const
 {
-    return (std::any_of(IO_queue.begin(), IO_queue.end(), [pid, this](size_t idx) { return pid == process_pool[idx].getPid(); }));
+    return (std::any_of(IO_queue.begin(),
+                        IO_queue.end(),
+                        [pid, this](size_t idx) { return pid == process_pool[idx].getPid(); }));
 }
 
 void IOManager::clear()

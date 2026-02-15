@@ -2,7 +2,8 @@
 
 #include <LogsJson.h>
 
-Metrics::Metrics(std::vector<PCB>& process_pool) : process_pool(process_pool), metrics_calculated(false)
+Metrics::Metrics(std::vector<PCB>& process_pool)
+    : process_pool(process_pool), metrics_calculated(false)
 {
 }
 
@@ -32,7 +33,8 @@ SystemMetrics Metrics::calculate(int total_time)
         metrics.per_process.push_back(pm);
     }
 
-    metrics.avg_turnaround_time = static_cast<double>(total_turnaround_time) / metrics.total_processes;
+    metrics.avg_turnaround_time =
+        static_cast<double>(total_turnaround_time) / metrics.total_processes;
     metrics.avg_waiting_time = static_cast<double>(total_waiting_time) / metrics.total_processes;
     metrics.avg_response_time = static_cast<double>(total_response_time) / metrics.total_processes;
     metrics.cpu_utilization = (static_cast<double>(total_cpu_time) / total_time) * 100;

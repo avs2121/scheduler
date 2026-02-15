@@ -54,7 +54,8 @@ class ConfigLoaderConstructionTest : public TestFixture
         assert_true(fileExists(logfile), "Logfile should exist");
         assert_true(countLines(logfile) > 0, "Logfile must have content");
 
-        // need to have created and asserted, that the logfile exist (with content) before the configloader can load it.
+        // need to have created and asserted, that the logfile exist (with content) before the
+        // configloader can load it.
         ConfigLoader cf(logfile);
     }
 };
@@ -94,7 +95,8 @@ class ConfigLoaderGetProcessConfig : public TestFixture
         assert_true(fileExists(logfile), "Logfile should exist");
         assert_true(countLines(logfile) > 0, "Logfile must have content");
 
-        // need to have created and asserted, that the logfile exist (with content) before the configloader can load it.
+        // need to have created and asserted, that the logfile exist (with content) before the
+        // configloader can load it.
         ConfigLoader cf(logfile);
 
         std::vector<ProcessConfig> getProcesses = cf.getProcessConfig();
@@ -102,9 +104,15 @@ class ConfigLoaderGetProcessConfig : public TestFixture
         assert_true(!getProcesses.empty(), "Process config should not be empty");
         assert_equal(testconf_proc.pid, getProcesses.at(0).pid, "PID's should be equal");
         assert_equal(testconf_proc.burst, getProcesses.at(0).burst, "burst should be equal");
-        assert_equal(testconf_proc.io_bound, getProcesses.at(0).io_bound, "io bound should be equal");
-        assert_equal(testconf_proc.io_interval, getProcesses.at(0).io_interval, "io interval should be equal");
-        assert_equal(testconf_proc.priority, getProcesses.at(0).priority, "priority should be equal");
+        assert_equal(testconf_proc.io_bound,
+                     getProcesses.at(0).io_bound,
+                     "io bound should be equal");
+        assert_equal(testconf_proc.io_interval,
+                     getProcesses.at(0).io_interval,
+                     "io interval should be equal");
+        assert_equal(testconf_proc.priority,
+                     getProcesses.at(0).priority,
+                     "priority should be equal");
     }
 };
 
@@ -143,13 +151,20 @@ class ConfigLoaderGetSchedulerConfig : public TestFixture
         assert_true(fileExists(logfile), "Logfile should exist");
         assert_true(countLines(logfile) > 0, "Logfile must have content");
 
-        // need to have created and asserted, that the logfile exist (with content) before the configloader can load it.
+        // need to have created and asserted, that the logfile exist (with content) before the
+        // configloader can load it.
         ConfigLoader cf(logfile);
 
         SchedulerConfig getScheduler = cf.getSchedulerConfig();
-        assert_equal(testconf_sched.aging_threshold, getScheduler.aging_threshold.value(), "Aging threshold should be equal");
-        assert_equal(testconf_sched.max_priority, getScheduler.max_priority.value(), "Max priority should be equal");
-        assert_equal(testconf_sched.time_quantum, getScheduler.time_quantum.value(), "Time quantum should be equal");
+        assert_equal(testconf_sched.aging_threshold,
+                     getScheduler.aging_threshold,
+                     "Aging threshold should be equal");
+        assert_equal(testconf_sched.max_priority,
+                     getScheduler.max_priority,
+                     "Max priority should be equal");
+        assert_equal(testconf_sched.time_quantum,
+                     getScheduler.time_quantum,
+                     "Time quantum should be equal");
     }
 };
 
@@ -194,5 +209,6 @@ void run_configloader_tests()
         failed++;
     }
 
-    std::cout << "Configloader test passed with: " << passed << " passed , " << failed << " failed" << std::endl;
+    std::cout << "Configloader test passed with: " << passed << " passed , " << failed << " failed"
+              << std::endl;
 }

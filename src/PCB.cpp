@@ -2,7 +2,14 @@
 
 #include <algorithm>
 
-PCB::PCB(int pid, int prio, int burst, bool io_bound, int io_interval, int aging_threshold, int time_quantum) : pid(pid), prio(prio), burst_time(burst), io_bound(io_bound), io_interval(io_interval)
+PCB::PCB(int pid,
+         int prio,
+         int burst,
+         bool io_bound,
+         int io_interval,
+         int aging_threshold,
+         int time_quantum)
+    : pid(pid), prio(prio), burst_time(burst), io_bound(io_bound), io_interval(io_interval)
 {
     this->old_prio = prio;
     this->remaining_time = burst;
@@ -255,7 +262,9 @@ bool PCB::isFinished() const
 
 std::ostream& operator<<(std::ostream& out, const PCB& p)
 {
-    out << "{PID:" << p.pid << ", Prio:" << p.prio << ", Burst:" << p.burst_time << ", Remain:" << p.remaining_time << ", Waited: " << p.waiting_time << ", io bound: " << std::boolalpha << p.io_bound
-        << ", io interval: " << p.io_interval << ", cpu used: " << p.cpu_used_on_process << ", state: " << p.getStringState() << "}";
+    out << "{PID:" << p.pid << ", Prio:" << p.prio << ", Burst:" << p.burst_time
+        << ", Remain:" << p.remaining_time << ", Waited: " << p.waiting_time
+        << ", io bound: " << std::boolalpha << p.io_bound << ", io interval: " << p.io_interval
+        << ", cpu used: " << p.cpu_used_on_process << ", state: " << p.getStringState() << "}";
     return out;
 }

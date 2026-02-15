@@ -14,7 +14,13 @@ class PCB
     friend std::ostream& operator<<(std::ostream& out, const PCB& p);
 
    public:
-    PCB(int pid, int prio, int burst, bool io_bound, int io_interval, int aging_threshold, int time_quantum);
+    PCB(int pid,
+        int prio,
+        int burst,
+        bool io_bound,
+        int io_interval,
+        int aging_threshold,
+        int time_quantum);
 
     int execute(int timeslice);
     int computeExecuteTime(int timeslice);

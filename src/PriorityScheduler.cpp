@@ -13,7 +13,8 @@ int main()
 
     if (!std::filesystem::exists(config_path))
     {
-        throw std::runtime_error("Config file doesnt exist at the provided path: " + config_path.string());
+        throw std::runtime_error("Config file doesnt exist at the provided path: " +
+                                 config_path.string());
     }
 
     Scheduler scheduler("proces_logs", config_path.string());
