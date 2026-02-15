@@ -54,9 +54,8 @@ void Scheduler::loadConfig(std::string config_file)
 
 void Scheduler::priorityScheduling()
 {
-    std::sort(process_pool.begin(),
-              process_pool.end(),
-              [](const PCB& a, const PCB& b) { return a.getPriority() < b.getPriority(); });
+    // sort the process pool, by lowest priority first, by using ranges with projections
+    std::ranges::sort(process_pool, std::ranges::less{}, &PCB::getPriority);
 
     debug(EXEC, "Process order");
     for (const auto& proc : process_pool)
@@ -170,9 +169,8 @@ void Scheduler::flushLogs()
 bool Scheduler::cleanUpQueues(int& currentTime, int& lastTime)
 {
     // Check if all work is done.
-    bool hasRemainingWork = std::any_of(process_pool.begin(),
-                                        process_pool.end(),
-                                        [](const PCB& p) { return p.getRemainingTime() > 0; });
+    bool hasRemainingWork =
+        std::ranges::any_of(process_pool, [](const PCB& p) { return p.getRemainingTime() > 0; });
 
     // If this condition is met, all processes done.
     if (!hasRemainingWork && IO_Processes->isEmpty())
@@ -181,10 +179,9 @@ bool Scheduler::cleanUpQueues(int& currentTime, int& lastTime)
         return false;
     }
 
-    // Check if Ready Queue has processes to process.
-    bool anyQueueHasWork = std::any_of(readyQueue.begin() + 1,
-                                       readyQueue.end(),
-                                       [](const auto& q) { return !q.empty(); });
+    // Check if Ready Queue has processes to process. Remember to skip first element (priority = 0).
+    bool anyQueueHasWork = std::ranges::any_of(readyQueue | std::views::drop(1),
+                                               [](const auto& q) { return !q.empty(); });
 
     // If all processes are in IO wait, advance time
     if (!anyQueueHasWork && !IO_Processes->isEmpty())
