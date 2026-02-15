@@ -6,15 +6,19 @@
 
 using json = nlohmann::json;
 
+static constexpr int DEFAULT_TIME_QUANTUM = 4;
+static constexpr int DEFAULT_AGING_THRESHOLD = 5;
+static constexpr int DEFAULT_MAX_PRIORITY = 3;
+
 /* ScheduleConfig struct
     Values can be provided for specific implementation. If not provided, will default to pre-set values.
     -> Therefore not requirement to provide these.
 */
 struct SchedulerConfig
 {
-    std::optional<int> time_quantum;
-    std::optional<int> max_priority;
-    std::optional<int> aging_threshold;
+    int max_priority;
+    int aging_threshold;
+    int time_quantum;
 };
 
 // Process config struct
@@ -34,14 +38,15 @@ class ConfigLoader
     ConfigLoader(const std::string& config_file);
 
     std::vector<ProcessConfig> getProcessConfig() const;
-    SchedulerConfig getSchedulerConfig() const;
-    bool validate() const;
+    const SchedulerConfig& getSchedulerConfig() const;
 
    private:
     json config_data;
     std::string config_file;
+    SchedulerConfig sched_conf;
 
+    void validate();
     void loadFromFile();
-    void validateSchedulerConfig() const;
+    void validateSchedulerConfig();
     void validateProcessConfig() const;
 };

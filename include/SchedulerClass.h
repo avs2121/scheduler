@@ -11,6 +11,8 @@
 #include "PCB.h"
 #include "ReadyQueue.h"
 
+static constexpr int MAX_PROCESS_SIZE = 100;
+
 class Scheduler
 {
    public:
@@ -53,7 +55,6 @@ class Scheduler
     // Statemachine
     void run();
 
-    void simulateTime(int ms);
     ~Scheduler() = default;
 
    private:
@@ -92,7 +93,6 @@ class Scheduler
 
     int currentTime;
 
-    static constexpr int MAX_PROCESS_SIZE = 100;
     std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>> readyQueue;
     std::optional<IOManager> IO_Processes;
     std::optional<Metrics> metrics;
@@ -105,11 +105,7 @@ class Scheduler
     SchedulerConfig sched_conf;
     std::vector<ProcessConfig> proc_conf;
 
-    int time_quantum;
-    int aging_threshold;
-    int max_priority;
-
-    static constexpr int DEFAULT_TIME_QUANTUM = 4;
-    static constexpr int DEFAULT_AGING_THRESHOLD = 5;
-    static constexpr int DEFAULT_MAX_PRIORITY = 3;
+    int time_quantum_sched;
+    int aging_threshold_sched;
+    int max_priority_sched;
 };

@@ -13,10 +13,7 @@ static std::filesystem::path LOG_DIR = "logs";
 ConfigLoader::ConfigLoader(const std::string& config_file) : config_file(config_file)
 {
     loadFromFile();
-    if (!validate())
-    {
-        throw std::runtime_error("Error with validating file: " + config_file);
-    }
+    validate();
 }
 
 void ConfigLoader::loadFromFile()
@@ -50,28 +47,19 @@ std::vector<ProcessConfig> ConfigLoader::getProcessConfig() const
     return vector_conf;
 }
 
-SchedulerConfig ConfigLoader::getSchedulerConfig() const
+const SchedulerConfig& ConfigLoader::getSchedulerConfig() const
 {
-    SchedulerConfig conf;
-
-    auto sched = config_data["scheduler_config"];
-    conf.aging_threshold = sched["aging_threshold"];
-    conf.max_priority = sched["max_priority"];
-    conf.time_quantum = sched["time_quantum"];
-
-    return conf;
+    return sched_conf;
 }
 
-bool ConfigLoader::validate() const
+void ConfigLoader::validate()
 {
     validateSchedulerConfig();
-    validateSchedulerConfig();
-
-    return true;
+    validateProcessConfig();
 }
 
 // validate the required scheduler config numbers are inside the demands
-void ConfigLoader::validateSchedulerConfig() const
+void ConfigLoader::validateSchedulerConfig()
 {
     if (!config_data.contains("scheduler_config"))
     {
@@ -79,19 +67,47 @@ void ConfigLoader::validateSchedulerConfig() const
     }
 
     auto sched = config_data["scheduler_config"];
-    if (sched["time_quantum"] <= 0)
+
+    if (sched.contains("time_quantum"))
     {
-        throw std::runtime_error("Error in time_quantum in scheduler config");
+        int val = sched["time_quantum"].get<int>();
+        if (val <= 0)
+        {
+            throw std::runtime_error("Error in time_quantum in scheduler config");
+        }
+        sched_conf.time_quantum = val;
+    }
+    else
+    {
+        sched_conf.time_quantum = DEFAULT_TIME_QUANTUM;
     }
 
-    if (sched["max_priority"] > 10 || sched["max_priority"] <= 0)
+    if (sched.contains("max_priority"))
     {
-        throw std::runtime_error("Error in max_priority in scheduler config");
+        int val = sched["max_priority"].get<int>();
+        if (val > 10 || val <= 0)
+        {
+            throw std::runtime_error("Error in max_priority in scheduler config");
+        }
+        sched_conf.max_priority = val;
+    }
+    else
+    {
+        sched_conf.max_priority = DEFAULT_MAX_PRIORITY;
     }
 
-    if (sched["aging_threshold"] <= 0)
+    if (sched.contains("aging_threshold"))
     {
-        throw std::runtime_error("Error in aging_threshold in scheduler config");
+        int val = sched["aging_threshold"].get<int>();
+        if (val <= 0)
+        {
+            throw std::runtime_error("Error in aging_threshold in scheduler config");
+        }
+        sched_conf.aging_threshold = val;
+    }
+    else
+    {
+        sched_conf.aging_threshold = DEFAULT_AGING_THRESHOLD;
     }
 }
 
@@ -103,7 +119,7 @@ void ConfigLoader::validateProcessConfig() const
         throw std::runtime_error("Error in process config - missing process array");
     }
 
-    if (!config_data.empty())
+    if (config_data["processes"].empty())
     {
         throw std::runtime_error("Error in process config - empty process array");
     }

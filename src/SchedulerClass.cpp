@@ -18,11 +18,11 @@ Scheduler::Scheduler(std::string logs_name, std::string config_file) : logs_name
 void Scheduler::loadConfig(std::string config_file)
 {
     sched_conf = loader.getSchedulerConfig();
-    time_quantum = sched_conf.time_quantum.value_or(DEFAULT_TIME_QUANTUM);
-    aging_threshold = sched_conf.aging_threshold.value_or(DEFAULT_AGING_THRESHOLD);
-    max_priority = sched_conf.max_priority.value_or(DEFAULT_MAX_PRIORITY);
+    time_quantum_sched = sched_conf.time_quantum;
+    aging_threshold_sched = sched_conf.aging_threshold;
+    max_priority_sched = sched_conf.max_priority;
 
-    readyQueue.resize(max_priority + 1);  // after getting the max_priority value, resize the container.
+    readyQueue.resize(max_priority_sched + 1);  // after getting the max_priority value, resize the container.
 
     proc_conf = loader.getProcessConfig();
     if (proc_conf.size() > MAX_PROCESS_SIZE)
@@ -35,7 +35,7 @@ void Scheduler::loadConfig(std::string config_file)
 
     for (const auto& pc : proc_conf)
     {
-        process_pool.emplace_back(pc.pid, pc.priority, pc.burst, pc.io_bound, pc.io_interval, aging_threshold, time_quantum);
+        process_pool.emplace_back(pc.pid, pc.priority, pc.burst, pc.io_bound, pc.io_interval, aging_threshold_sched, time_quantum_sched);
     }
 
     IO_Processes.emplace(process_pool);
@@ -206,9 +206,9 @@ void Scheduler::roundRobin()
 {
     for (size_t p = 0; p < process_pool.size(); p++)
     {
-        if (process_pool[p].getPriority() < 0 || process_pool[p].getPriority() > max_priority)  // use clamp!
+        if (process_pool[p].getPriority() < 0 || process_pool[p].getPriority() > max_priority_sched)  // use clamp!
         {
-            process_pool[p].setPriority(std::clamp(process_pool[p].getPriority(), 1, max_priority));
+            process_pool[p].setPriority(std::clamp(process_pool[p].getPriority(), 1, max_priority_sched));
             debug(WARNING, "Clamping prio - otherwise out of index");
         }
         readyQueue[process_pool[p].getPriority()].push(p);
@@ -224,7 +224,7 @@ void Scheduler::roundRobin()
             break;
         }
         // Execute process
-        for (auto el = 1; el <= max_priority; ++el)
+        for (auto el = 1; el <= max_priority_sched; ++el)
         {
             if (!readyQueue[el].empty())
             {
@@ -233,7 +233,7 @@ void Scheduler::roundRobin()
                       {
                           std::ostringstream oss;
                           oss << "=== Queue status at time " << currentTime << " ===\n";
-                          for (int prio = 1; prio <= max_priority; ++prio)
+                          for (int prio = 1; prio <= max_priority_sched; ++prio)
                           {
                               if (!readyQueue[prio].empty())
                               {
@@ -279,7 +279,7 @@ void Scheduler::roundRobin()
                 }
 
                 //***** Execute process *****//
-                int timeElapsed = p.execute(time_quantum);
+                int timeElapsed = p.execute(time_quantum_sched);
                 currentTime += timeElapsed;
 
                 debug(EXEC,
@@ -373,11 +373,6 @@ size_t Scheduler::pidToIndex(int pid) const
 int Scheduler::indexToPid(size_t idx) const
 {
     return idx + 1;
-}
-
-void Scheduler::simulateTime(int ms)
-{
-    // std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
 void Scheduler::setDebugFlags(int flags)
