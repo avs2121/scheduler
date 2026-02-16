@@ -94,8 +94,8 @@ class Scheduler
     int currentTime;
 
     std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>> readyQueue;
-    std::optional<IOManager> IO_Processes;
-    std::optional<Metrics> metrics;
+    std::optional<IOManager> IO_Processes;  // for lazy/delayed initialization
+    std::optional<Metrics> metrics;         // for lazy/delayed initialization
 
     std::string logs_name;
     std::vector<json> eventLog;  // store json objects for logging

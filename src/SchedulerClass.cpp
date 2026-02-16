@@ -48,6 +48,8 @@ void Scheduler::loadConfig(std::string config_file)
                                   time_quantum_sched);
     }
 
+    // lazy initialization with std::optional,
+    // used because the values loading, isnt known before this point.
     IO_Processes.emplace(process_pool);
     metrics.emplace(process_pool);
 }
