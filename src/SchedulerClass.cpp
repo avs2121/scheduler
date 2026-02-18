@@ -263,20 +263,33 @@ void Scheduler::roundRobin()
                       [&]()
                       {
                           std::ostringstream oss;
-                          oss << "=== Queue status at time " << currentTime << " ===\n";
+                          // Ready queues
+
                           for (int prio = 1; prio <= max_priority_sched; ++prio)
                           {
-                              if (!readyQueue[prio].empty())
-                              {
-                                  oss << "Priority " << prio << ": " << readyQueue[prio] << "\n";
-                              }
-                              oss << "IO wait queue size: " << IO_Processes->size()
-                                  << "\n========================\n";
+                              oss << "Priority " << prio << ": " << readyQueue[prio] << "\n";
                           }
+
+                          oss << "\n";
+
+                          oss << "\n========================\n";
+
+                          // IO queue
+                          oss << "IO wait queue: ";
+
+                          for (size_t idx : IO_Processes->getQueue())
+                          {
+                              oss << idx << " ";
+                          }
+
+                          oss << "\n========================\n";
+                          oss << "IO wait queue size: " << IO_Processes->size();
+
                           return oss.str();
                       });
 
                 size_t i = readyQueue[el].pop();
+
                 PCB& p = process_pool[i];
 
                 //***** check if context switch *****//
@@ -340,6 +353,7 @@ void Scheduler::roundRobin()
 
                 if (p.getRemainingTime() <= 0)
                 {
+                    debug(EXEC, std::format("Process PID: {}, finished", p.getPid()));
                     p.setCompletionTime(currentTime);
                 }
 
@@ -376,19 +390,19 @@ void Scheduler::run()
         switch (curr_state)
         {
             case Process_STATE::READY:
-                // debug(EXEC, "In Process_State ready");
+                debug(EXEC, "In Process_State ready");
+                priorityScheduling();
                 curr_state = Process_STATE::RUNNING;
                 break;
 
             case Process_STATE::RUNNING:
-                // debug(EXEC, "In Process_State Running");
-                priorityScheduling();
+                debug(EXEC, "In Process_State Running");
                 roundRobin();
                 curr_state = Process_STATE::FINISHED;
                 break;
 
             case Process_STATE::FINISHED:
-                // debug(EXEC, "In Process_State finished");
+                debug(EXEC, "In Process_State finished");
                 SystemMetrics sm{};
                 sm = metrics->calculate(currentTime);
                 metrics->writeToFile(logs_name + "_metrics");

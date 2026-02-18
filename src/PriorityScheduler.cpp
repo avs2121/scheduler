@@ -19,7 +19,7 @@ int main()
 
     Scheduler scheduler("proces_logs", config_path.string());
 
-    scheduler.setDebugFlags(Scheduler::EXEC | Scheduler::WARNING);
+    scheduler.setDebugFlags(Scheduler::ALL);
 
     std::thread t1([&scheduler]() { scheduler.run(); });
 

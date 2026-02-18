@@ -15,6 +15,7 @@ class ReadyQueue
     void clear();
     bool remove(T value);
     bool contains(T value) const;
+    T front() const;
 
     friend std::ostream& operator<<(std::ostream& out, const ReadyQueue& rq)
     {
@@ -144,4 +145,15 @@ bool ReadyQueue<T, N>::contains(T value) const
         i = (i + 1) % N;
     }
     return false;
+}
+
+template <typename T, size_t N>
+T ReadyQueue<T, N>::front() const
+{
+    if (empty())
+    {
+        std::cerr << "Queue empty" << std::endl;
+    }
+
+    return data[head];
 }
