@@ -92,6 +92,7 @@ class Scheduler
     std::vector<PCB> process_pool;
 
     int currentTime;
+    std::optional<PCB> lastProcess;
 
     std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>> readyQueue;
     std::optional<IOManager> IO_Processes;  // for lazy/delayed initialization
@@ -108,4 +109,5 @@ class Scheduler
     int time_quantum_sched;
     int aging_threshold_sched;
     int max_priority_sched;
+    int context_switch_time_sched;
 };

@@ -2,7 +2,8 @@
     "scheduler_config": {
         "time_quantum": 4,
         "aging_threshold": 5,
-        "max_priority": 3
+        "max_priority": 3,
+        "context_switch_time": 1
     },
     "processes": [
         {

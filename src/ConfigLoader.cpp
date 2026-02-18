@@ -109,6 +109,20 @@ void ConfigLoader::validateSchedulerConfig()
     {
         sched_conf.aging_threshold = DEFAULT_AGING_THRESHOLD;
     }
+
+    if (sched.contains("context_switch_time"))
+    {
+        int val = sched["context_switch_time"].get<int>();
+        if (val <= 0)
+        {
+            throw std::runtime_error("Error in context_switch_time in scheduler config");
+        }
+        sched_conf.context_switch_time = val;
+    }
+    else
+    {
+        sched_conf.context_switch_time = DEFAULT_AGING_THRESHOLD;
+    }
 }
 
 // validate process config for e.g no duplicate pids

@@ -23,6 +23,7 @@ void Scheduler::loadConfig(std::string config_file)
     time_quantum_sched = sched_conf.time_quantum;
     aging_threshold_sched = sched_conf.aging_threshold;
     max_priority_sched = sched_conf.max_priority;
+    context_switch_time_sched = sched_conf.context_switch_time;
 
     readyQueue.resize(max_priority_sched +
                       1);  // after getting the max_priority value, resize the container.
@@ -68,6 +69,13 @@ void Scheduler::priorityScheduling()
                           proc.getBurstTime(),
                           proc.getPriority()));
     }
+    debug(EXEC,
+          std::format(
+              "Time Quantum: {}, Max Priority: {}, Aging Threshold: {}, Context Switch Time: {}",
+              time_quantum_sched,
+              max_priority_sched,
+              aging_threshold_sched,
+              context_switch_time_sched));
 }
 
 void Scheduler::updateQueuesAfterAging(PCB* p, int& time_slice)
@@ -271,6 +279,12 @@ void Scheduler::roundRobin()
                 size_t i = readyQueue[el].pop();
                 PCB& p = process_pool[i];
 
+                //***** check if context switch *****//
+                if (lastProcess.has_value() && p.getPid() != lastProcess->getPid())
+                {
+                    currentTime += context_switch_time_sched;  // increment with context switch
+                }
+
                 //***** calculate time delta *****//
                 int delta = currentTime - lastTime;
 
@@ -297,8 +311,8 @@ void Scheduler::roundRobin()
                 }
 
                 //***** To track first response for processes *****//
-                if (p.isFirstResponse() ==
-                    false)  // if its the process' first time about to execute, set these values.
+                if (!p.isFirstResponse())  // if its the process' first time about to execute, set
+                                           // these values.
                 {
                     p.recordFirstResponse(currentTime);
                 }
@@ -333,6 +347,7 @@ void Scheduler::roundRobin()
                 updateQueuesAfterAging(&p, delta);
 
                 lastTime = currentTime;
+                lastProcess.emplace(p);
                 //***** Update logs *****//
                 logEvent(&p);
                 break;
