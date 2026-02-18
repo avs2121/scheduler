@@ -4,11 +4,6 @@
 #include <ranges>
 #include <sstream>
 
-#include "IOManager.h"
-#include "LogsJson.h"
-#include "PCB.h"
-#include "ReadyQueue.h"
-
 Scheduler::Scheduler(std::string logs_name, std::string config_file)
     : logs_name(logs_name), config_file(config_file), loader(config_file)
 {
