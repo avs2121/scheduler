@@ -267,19 +267,20 @@ void Scheduler::roundRobin()
 
                           for (int prio = 1; prio <= max_priority_sched; ++prio)
                           {
-                              oss << "Priority " << prio << ": " << readyQueue[prio] << "\n";
+                              oss << "Priority: " << prio << " contains: ";
+                              for (size_t idx : readyQueue[prio].toVector())
+                              {
+                                  oss << "PID: " << process_pool[idx].getPid() << " ";
+                              }
+                              oss << "\n";
                           }
-
-                          oss << "\n";
-
                           oss << "\n========================\n";
-
                           // IO queue
                           oss << "IO wait queue: ";
 
                           for (size_t idx : IO_Processes->getQueue())
                           {
-                              oss << idx << " ";
+                              oss << "PID: " << process_pool[idx].getPid() << " ";
                           }
 
                           oss << "\n========================\n";

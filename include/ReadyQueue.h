@@ -2,6 +2,7 @@
 #include <array>
 #include <iostream>
 #include <ostream>
+#include <vector>
 
 template <typename T, size_t N>
 
@@ -16,6 +17,7 @@ class ReadyQueue
     bool remove(T value);
     bool contains(T value) const;
     T front() const;
+    std::vector<T> toVector() const;
 
     friend std::ostream& operator<<(std::ostream& out, const ReadyQueue& rq)
     {
@@ -156,4 +158,19 @@ T ReadyQueue<T, N>::front() const
     }
 
     return data[head];
+}
+
+template <typename T, size_t N>
+std::vector<T> ReadyQueue<T, N>::toVector() const
+{
+    std::vector<T> vec;
+    vec.reserve(count);
+    size_t i = head;
+
+    for (size_t c = 0; c < count; c++)
+    {
+        vec.push_back(data[i]);
+        i = (i % 1) % N;
+    }
+    return vec;
 }
