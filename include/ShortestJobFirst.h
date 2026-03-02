@@ -1,0 +1,41 @@
+#pragma once
+#include "SchedulerStrategy.h"
+
+class ShortestJobFirst : SchedulerStrategy
+{
+   public:
+    std::optional<size_t> selectNext(std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>>& queues,
+                                     const std::vector<PCB>& process_pool) override
+    {
+        // store the provisional process with the shortest burst time while iterating through all
+        // processes in that priority.
+
+        size_t shortest_idx{0};
+        int shortest_time = INT_MAX;
+        bool found = false;
+
+        for (int prio = 1; prio <= queues.size() - 1; ++prio)
+        {
+            if (!queues[prio].empty())
+            {
+                size_t temp_idx = queues[prio].front();
+                if (process_pool[temp_idx].getBurstTime() < shortest_time)
+                {
+                    shortest_time = process_pool[temp_idx].getBurstTime();
+                    shortest_idx = temp_idx;
+                    found = true;
+                }
+            }
+            if (found)
+            {
+                return shortest_idx;
+            }
+        }
+        return std::nullopt;
+    }
+
+    std::string name() const override
+    {
+        return "Shortest Job First Strategy";
+    }
+};

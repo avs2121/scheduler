@@ -170,7 +170,7 @@ std::vector<T> ReadyQueue<T, N>::toVector() const
     for (size_t c = 0; c < count; c++)
     {
         vec.push_back(data[i]);
-        i = (i % 1) % N;
+        i = (i + 1) % N;
     }
     return vec;
 }
