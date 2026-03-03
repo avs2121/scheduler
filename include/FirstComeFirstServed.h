@@ -8,6 +8,28 @@ class FirstComeFirstServed : SchedulerStrategy
                                      const std::vector<PCB>& process_pool) override
     {
         // Store the first arrived process in the highest priority
+        // maybe just take queues[0] ?
+        size_t idx{0};
+        bool found = false;
+        for (auto prio = 1; prio <= queues.size() - 1; ++prio)
+        {
+            if (!queues.empty())
+            {
+                std::cout << "Choose from FCFS: " << queues[prio].front() << std::endl;
+                idx = queues[prio].front();
+                found = true;
+            }
+            if (found)
+            {
+                for (auto& q : queues)
+                {
+                    q.remove(idx);
+                    break;
+                }
+                return idx;
+            }
+        }
+
         return std::nullopt;
     }
 

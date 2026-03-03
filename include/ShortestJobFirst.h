@@ -19,6 +19,8 @@ class ShortestJobFirst : SchedulerStrategy
             if (!queues[prio].empty())
             {
                 size_t temp_idx = queues[prio].front();
+                std::cout << "Choose from FCFS: " << queues[prio].front() << std::endl;
+
                 if (process_pool[temp_idx].getRemainingTime() < shortest_time)
                 {
                     shortest_time = process_pool[temp_idx].getRemainingTime();

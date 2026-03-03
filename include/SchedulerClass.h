@@ -27,6 +27,7 @@ class Scheduler
         IO = 1 << 2,       // 4
         QUEUE = 1 << 3,    // 8
         WARNING = 1 << 4,  // 16
+        EXTRA = 1 << 5,    // 32
         ALL = 0xFFFF
     };
 

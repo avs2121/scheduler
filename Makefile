@@ -17,7 +17,8 @@ MAIN_SRC = $(SRC_PATH)/PriorityScheduler.cpp
 TEST_SRC = $(TEST_PATH)/test_main.cpp $(TEST_PATH)/test_scheduler.cpp $(TEST_PATH)/test_pcb.cpp $(TEST_PATH)/test_io.cpp $(TEST_PATH)/test_configloader.cpp $(TEST_PATH)/TestFixture.cpp
 
 #Include files
-INC = $(INC_PATH)/ReadyQueue.h $(INC_PATH)/SchedulerClass.h $(INC_PATH)/PCB.h $(INC_PATH)/IOManager.h $(INC_PATH)/Metrics.h $(INC_PATH)/ConfigLoader.h
+# $(INC_PATH)SchedulerStrategy.h $(INC_PATH)PriorityRoundRobin.h $(INC_PATH)ShortestJobFirst.h $(INC_PATH)FirstComeFirstServed.h
+INC = $(INC_PATH)/ReadyQueue.h $(INC_PATH)/SchedulerClass.h $(INC_PATH)/PCB.h $(INC_PATH)/IOManager.h $(INC_PATH)/Metrics.h $(INC_PATH)/ConfigLoader.h 
 TEST_INC = $(TEST_PATH)/TestFixture.h
 
 #Targets

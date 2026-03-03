@@ -280,6 +280,7 @@ void Scheduler::roundRobin()
 
                           oss << "\n========================\n";
                           oss << "IO wait queue size: " << IO_Processes->size();
+                          oss << "\n========================\n";
 
                           return oss.str();
                       });
@@ -287,6 +288,11 @@ void Scheduler::roundRobin()
                 size_t i = readyQueue[el].pop();
 
                 PCB& p = process_pool[i];
+
+                debug(EXTRA,
+                      std::format("Selected process pid: {}, in state={}",
+                                  p.getPid(),
+                                  p.getStringState()));
 
                 //***** check if context switch *****//
                 if (lastProcess.has_value() && p.getPid() != lastProcess->getPid())
@@ -297,10 +303,23 @@ void Scheduler::roundRobin()
                 //***** calculate time delta *****//
                 int delta = currentTime - lastTime;
 
+                debug(EXTRA,
+                      std::format("time calculation, current time={}, lasttime={}, delta={}",
+                                  currentTime,
+                                  lastTime,
+                                  delta));
+
                 //***** IO Wait Queue management *****//
                 // want to process IO first, for alredy waiting processes
                 if (delta > 0)
                 {
+                    debug(EXTRA,
+                          std::format(
+                              "IN IO WAIT QUEUE MANAGEMENT, current time={}, lasttime={}, delta={}",
+                              currentTime,
+                              lastTime,
+                              delta));
+
                     IO_Processes->processIO(delta);
 
                     // move finished IO processes
@@ -327,6 +346,15 @@ void Scheduler::roundRobin()
                 }
 
                 //***** Execute process *****//
+                debug(EXTRA,
+                      std::format(
+                          "PID: {}, ready={}, waitingIO={}, remainingtime={}, remainingIO={}\n",
+                          p.getPid(),
+                          p.isReady(),
+                          p.isWaitingIO(),
+                          p.getRemainingTime(),
+                          p.getIORemainingTime()));
+
                 int timeElapsed = p.execute(time_quantum_sched);
                 currentTime += timeElapsed;
                 debug(EXEC,
@@ -337,6 +365,20 @@ void Scheduler::roundRobin()
                                   currentTime));
 
                 //***** handle state transitions + Update IO Wait Queue *****//
+                debug(EXTRA,
+                      [&]()
+                      {
+                          std::ostringstream oss;
+                          oss << "IO SIZE:" << std::to_string(IO_Processes->size());
+                          for (auto& p : IO_Processes->getQueue())
+                          {
+                              oss << "pid: " << process_pool[p].getPid()
+                                  << " state: " << process_pool[p].getStringState() << " ";
+                          }
+                          oss << "\n========================\nPrintQueue:\n";
+                          IO_Processes->printQueue();
+                          return oss.str();
+                      });
 
                 if (p.isWaitingIO() && !IO_Processes->containsPID(p.getPid()))
                 {
@@ -345,7 +387,9 @@ void Scheduler::roundRobin()
                 }
 
                 if (p.isReady() && timeElapsed > 0)
-                    readyQueue[el].push(i);
+                {
+                    readyQueue[p.getPriority()].push(i);
+                }
 
                 if (p.getRemainingTime() <= 0)
                 {
