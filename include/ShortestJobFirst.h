@@ -1,11 +1,12 @@
 #pragma once
 #include "SchedulerStrategy.h"
 
-class ShortestJobFirst : SchedulerStrategy
+class ShortestJobFirst : public SchedulerStrategy
 {
    public:
     std::optional<size_t> selectNext(std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>>& queues,
-                                     const std::vector<PCB>& process_pool) override
+                                     const std::vector<PCB>& process_pool,
+                                     int currentTime) override
     {
         // store the provisional process with the shortest remaining time while iterating through
         // all processes in that priority.

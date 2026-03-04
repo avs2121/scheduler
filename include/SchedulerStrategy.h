@@ -1,8 +1,12 @@
 #pragma once
+#include <iostream>
 #include <optional>
 #include <string>
+#include <vector>
 
-#include "SchedulerClass.h"
+#include "Constants.h"
+#include "PCB.h"
+#include "ReadyQueue.h"
 
 class SchedulerStrategy
 {
@@ -10,7 +14,8 @@ class SchedulerStrategy
     virtual ~SchedulerStrategy() = default;
     virtual std::optional<size_t> selectNext(
         std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>>& queues,
-        const std::vector<PCB>& process_pool) = 0;
+        const std::vector<PCB>& process_pool,
+        int currentTime) = 0;
 
     virtual std::string name() const = 0;
 };

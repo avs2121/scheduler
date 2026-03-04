@@ -2,14 +2,11 @@
 #include <string>
 #include <vector>
 
+#include "Constants.h"
 #include "nlohmann/json.hpp"
 
-using json = nlohmann::json;
 
-static constexpr int DEFAULT_TIME_QUANTUM = 4;
-static constexpr int DEFAULT_AGING_THRESHOLD = 5;
-static constexpr int DEFAULT_MAX_PRIORITY = 3;
-static constexpr int DEFAULT_CONTEXT_SWITCH_TIME = 1;
+using json = nlohmann::json;
 
 /* ScheduleConfig struct
     Values can be provided for specific implementation. If not provided, will default to pre-set
@@ -22,6 +19,7 @@ struct SchedulerConfig
     int aging_threshold;
     int time_quantum;
     int context_switch_time;
+    std::string algorithm;
 };
 
 // Process config struct

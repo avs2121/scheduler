@@ -19,6 +19,7 @@ void Scheduler::loadConfig(std::string config_file)
     aging_threshold_sched = sched_conf.aging_threshold;
     max_priority_sched = sched_conf.max_priority;
     context_switch_time_sched = sched_conf.context_switch_time;
+    algorithm_sched = sched_conf.algorithm;
 
     readyQueue.resize(max_priority_sched +
                       1);  // after getting the max_priority value, resize the container.
@@ -65,12 +66,13 @@ void Scheduler::priorityScheduling()
                           proc.getPriority()));
     }
     debug(EXEC,
-          std::format(
-              "Time Quantum: {}, Max Priority: {}, Aging Threshold: {}, Context Switch Time: {}",
-              time_quantum_sched,
-              max_priority_sched,
-              aging_threshold_sched,
-              context_switch_time_sched));
+          std::format("Time Quantum: {}, Max Priority: {}, Aging Threshold: {}, Context Switch "
+                      "Time: {}, Algorithm: {}",
+                      time_quantum_sched,
+                      max_priority_sched,
+                      aging_threshold_sched,
+                      context_switch_time_sched,
+                      algorithm_sched));
 }
 
 void Scheduler::updateQueuesAfterAging(PCB* p, int& time_slice)
@@ -226,7 +228,7 @@ bool Scheduler::cleanUpQueues(int& currentTime, int& lastTime)
     return true;
 }
 
-void Scheduler::roundRobin()
+void Scheduler::runSchedulingLoop()
 {
     for (size_t p = 0; p < process_pool.size(); p++)
     {
@@ -437,7 +439,7 @@ void Scheduler::run()
 
             case Process_STATE::RUNNING:
                 debug(EXEC, "In Process_State Running");
-                roundRobin();
+                runSchedulingLoop();
                 curr_state = Process_STATE::FINISHED;
                 break;
 

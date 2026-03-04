@@ -5,13 +5,14 @@
 #include <vector>
 
 #include "ConfigLoader.h"
+#include "Constants.h"
 #include "IOManager.h"
 #include "LogsJson.h"
 #include "Metrics.h"
 #include "PCB.h"
 #include "ReadyQueue.h"
+#include "StrategyFactory.h"
 
-static constexpr int MAX_PROCESS_SIZE = 100;
 
 class Scheduler
 {
@@ -48,7 +49,7 @@ class Scheduler
     // Scheduling + Queues setup.
     void priorityScheduling();
     bool cleanUpQueues(int& currentTime, int& lastTime);
-    void roundRobin();
+    void runSchedulingLoop();
 
     // load config
     void loadConfig(std::string config_file);
@@ -95,6 +96,8 @@ class Scheduler
     int currentTime;
     std::optional<PCB> lastProcess;
 
+    std::unique_ptr<StrategyFactory> strategy;
+
     std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>> readyQueue;
     std::optional<IOManager> IO_Processes;  // for lazy/delayed initialization
     std::optional<Metrics> metrics;         // for lazy/delayed initialization
@@ -111,4 +114,5 @@ class Scheduler
     int aging_threshold_sched;
     int max_priority_sched;
     int context_switch_time_sched;
+    std::string algorithm_sched;
 };

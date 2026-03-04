@@ -1,11 +1,12 @@
 #pragma once
 #include "SchedulerStrategy.h"
 
-class PriorityRoundRobin : SchedulerStrategy
+class PriorityRoundRobin : public SchedulerStrategy
 {
    public:
     std::optional<size_t> selectNext(std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>>& queues,
-                                     const std::vector<PCB>& process_pool) override
+                                     const std::vector<PCB>& process_pool,
+                                     int currentTime) override
     {
         for (int prio = 1; prio <= queues.size() - 1; ++prio)
         {
