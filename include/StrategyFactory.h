@@ -3,9 +3,8 @@
 
 #include "SchedulerStrategy.h"
 
-
 class StrategyFactory
 {
-    virtual std::unique_ptr<SchedulerStrategy> createStrategy() = 0;
-    virtual ~StrategyFactory() = default;
+   public:
+    static std::unique_ptr<SchedulerStrategy> createStrategy(const std::string& algo_name);
 };

@@ -12,7 +12,7 @@ class PriorityRoundRobin : public SchedulerStrategy
         {
             if (!queues[prio].empty())
             {
-                std::cout << "Choose from FCFS: " << queues[prio].front() << std::endl;
+                std::cout << "Choose from RR: " << queues[prio].front() << std::endl;
                 return queues[prio].pop();
             }
         }

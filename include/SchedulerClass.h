@@ -13,7 +13,6 @@
 #include "ReadyQueue.h"
 #include "StrategyFactory.h"
 
-
 class Scheduler
 {
    public:
@@ -96,7 +95,7 @@ class Scheduler
     int currentTime;
     std::optional<PCB> lastProcess;
 
-    std::unique_ptr<StrategyFactory> strategy;
+    std::unique_ptr<SchedulerStrategy> strategy;
 
     std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>> readyQueue;
     std::optional<IOManager> IO_Processes;  // for lazy/delayed initialization

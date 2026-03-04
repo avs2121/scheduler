@@ -6,6 +6,7 @@
 #include <iostream>
 #include <set>
 
+#include "Constants.h"
 #include "LogsJson.h"
 
 static std::filesystem::path LOG_DIR = "logs";

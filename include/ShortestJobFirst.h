@@ -1,4 +1,5 @@
 #pragma once
+
 #include "SchedulerStrategy.h"
 
 class ShortestJobFirst : public SchedulerStrategy
