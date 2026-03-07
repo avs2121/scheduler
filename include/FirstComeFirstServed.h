@@ -35,8 +35,44 @@ class FirstComeFirstServed : public SchedulerStrategy
         return std::nullopt;
     }
 
+    // runs for whole remaining time or until i/o
+    int getTimeSlice(const PCB& process, int default_quantum) const override
+    {
+        return process.getRemainingTime();
+    }
+
+    // doesnt preempt for newly arrived processes
+    bool shouldPreempt(const PCB& current_process, const PCB& new_process) const override
+    {
+        return false;
+    }
+
+    // only has one priority level (1)
+    int getReinsertionPolicy(const PCB& process) const override
+    {
+        return 1;
+    }
+
+    // doesnt use priority scheduling
+    bool usesPriorityQueues() const override
+    {
+        return false;
+    }
+
+    // doesnt use aging
+    bool usesAging() const override
+    {
+        return false;
+    }
+
     std::string name() const override
     {
         return "First Come First Served Strategy";
+    }
+
+    std::string description() const override
+    {
+        return "Non-Preemptive FCFS: The first process to enter the queue, will run until finished "
+               "or I/O Block";
     }
 };

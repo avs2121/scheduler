@@ -38,29 +38,31 @@ class Scheduler
     bool isDebugEnabled(DebugLevel level) const;
     int getDebugLevel() const;
 
-    // Queue handler
-    void updateQueuesAfterAging(PCB* p, int& time_slice);
-
-    // Logging
-    void logEvent(PCB* p);
-    void flushLogs();
-
-    // Scheduling + Queues setup.
-    void priorityScheduling();
-    bool cleanUpQueues(int& currentTime, int& lastTime);
-    void runSchedulingLoop();
-
-    // load config
-    void loadConfig(std::string config_file);
-
     // Statemachine
     void run();
 
     ~Scheduler() = default;
 
    private:
-    // Helper functions to debug
+    // Logging
+    void logEvent(PCB* p);
+    void flushLogs();
 
+    // Scheduling + Queues setup.
+    void QueueSorting();
+    bool cleanUpQueues(int& currentTime, int& lastTime);
+    void runSchedulingLoop();
+
+    // load config
+    void loadConfig(std::string config_file);
+
+    // Queue handler
+    void PriorityQueueSetup();
+    void updateQueuesAfterAging(PCB* p, int& time_slice);
+    void processIOCompletions(int& delta);
+    void handleProcessStateTransistion(PCB& p, size_t idx);
+
+    // Helper functions to debug
     // Debug helper for lambdas
     template <typename Func>
     auto debug(DebugLevel category, Func&& func) const -> decltype(func(), void())

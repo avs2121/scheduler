@@ -45,8 +45,45 @@ class ShortestJobFirst : public SchedulerStrategy
         return std::nullopt;  // absence of value -> no process to pop
     }
 
+    // check in the default_quantum interval whether it should preempt
+    int getTimeSlice(const PCB& process, int default_quantum) const override
+    {
+        return std::min(process.getRemainingTime(), default_quantum);
+    }
+
+    // should the new process preempt the current process, called when new process arrives / becomes
+    // ready
+    bool shouldPreempt(const PCB& current_process, const PCB& new_process) const override
+    {
+        return current_process.getRemainingTime() > new_process.getRemainingTime();
+    }
+
+    // called after process finish quantum to determine where it goes (priority level)
+    int getReinsertionPolicy(const PCB& process) const override
+    {
+        return process.getPriority();
+    }
+
+    // uses priority scheduling
+    bool usesPriorityQueues() const override
+    {
+        return true;
+    }
+
+    // uses aging
+    bool usesAging() const override
+    {
+        return true;
+    }
+
     std::string name() const override
     {
-        return "Shortest Job First Strategy";
+        return "Priority-based Shortest Job First Strategy";
+    }
+
+    std::string description() const override
+    {
+        return "Preemptive Priority-SJF: Always runs the process within the highest priority with "
+               "the least remaining time";
     }
 };
