@@ -19,6 +19,9 @@ void Scheduler::loadConfig(std::string config_file)
     aging_threshold_sched = sched_conf.aging_threshold;
     max_priority_sched = sched_conf.max_priority;
     context_switch_time_sched = sched_conf.context_switch_time;
+    algorithm_sched = sched_conf.algorithm;
+
+    strategy = StrategyFactory::createStrategy(algorithm_sched);
 
     readyQueue.resize(max_priority_sched +
                       1);  // after getting the max_priority value, resize the container.
@@ -50,10 +53,19 @@ void Scheduler::loadConfig(std::string config_file)
     metrics.emplace(process_pool);
 }
 
-void Scheduler::priorityScheduling()
+void Scheduler::QueueSorting()
 {
-    // sort the process pool, by lowest priority first, by using ranges with projections
-    std::ranges::sort(process_pool, std::ranges::less{}, &PCB::getPriority);
+    // sorting by by using ranges with projections
+    if (strategy->usesPriorityQueues())
+    {
+        // sort the process pool, by lowest priority first (for priority algo)
+        std::ranges::sort(process_pool, std::ranges::less{}, &PCB::getPriority);
+    }
+    else
+    {
+        // sort the process pool, by lowest remaining time first (for non-priority algo)
+        std::ranges::sort(process_pool, std::ranges::less{}, &PCB::getRemainingTime);
+    }
 
     debug(EXEC, "Process order");
     for (const auto& proc : process_pool)
@@ -65,12 +77,13 @@ void Scheduler::priorityScheduling()
                           proc.getPriority()));
     }
     debug(EXEC,
-          std::format(
-              "Time Quantum: {}, Max Priority: {}, Aging Threshold: {}, Context Switch Time: {}",
-              time_quantum_sched,
-              max_priority_sched,
-              aging_threshold_sched,
-              context_switch_time_sched));
+          std::format("Time Quantum: {}, Max Priority: {}, Aging Threshold: {}, Context Switch "
+                      "Time: {}, Algorithm: {}",
+                      time_quantum_sched,
+                      max_priority_sched,
+                      aging_threshold_sched,
+                      context_switch_time_sched,
+                      algorithm_sched));
 }
 
 void Scheduler::updateQueuesAfterAging(PCB* p, int& time_slice)
@@ -226,7 +239,42 @@ bool Scheduler::cleanUpQueues(int& currentTime, int& lastTime)
     return true;
 }
 
-void Scheduler::roundRobin()
+void Scheduler::processIOCompletions(int& delta)
+{
+    debug(EXTRA,
+          std::format("IN IO WAIT QUEUE MANAGEMENT, current time={}, lasttime={}, delta={}",
+                      currentTime,
+                      delta - currentTime,
+                      delta));
+
+    IO_Processes->processIO(delta);
+
+    // move finished IO processes
+    const auto& finished = IO_Processes->getFinishedProcesses();
+    for (size_t idx : finished)
+    {
+        PCB& proc = process_pool[idx];
+        if (proc.getRemainingTime() > 0 && proc.isReady())
+        {
+            readyQueue[proc.getPriority()].push(idx);
+        }
+    }
+    if (!finished.empty())
+    {
+        IO_Processes->clearFinished();
+    }
+}
+
+void Scheduler::handleProcessStateTransistion(PCB& p, size_t idx)
+{
+    if (p.isWaitingIO() && !IO_Processes->containsPID(p.getPid()))
+    {
+        IO_Processes->enqueue(idx);
+        IO_Processes->updateIO();
+    }
+}
+
+void Scheduler::PriorityQueueSetup()
 {
     for (size_t p = 0; p < process_pool.size(); p++)
     {
@@ -239,6 +287,14 @@ void Scheduler::roundRobin()
         }
         readyQueue[process_pool[p].getPriority()].push(p);
     }
+}
+
+void Scheduler::runSchedulingLoop()
+{
+    if (strategy->usesPriorityQueues())
+    {
+        PriorityQueueSetup();
+    }
 
     currentTime = 0;  // track current time
     int lastTime = 0;
@@ -250,121 +306,108 @@ void Scheduler::roundRobin()
             break;
         }
         // Execute process
-        for (auto el = 1; el <= max_priority_sched; ++el)
+
+        auto next_idx = strategy->selectNext(readyQueue, process_pool, currentTime);
+
+        if (!next_idx.has_value())
         {
-            if (!readyQueue[el].empty())
-            {
-                debug(QUEUE,
-                      [&]()
-                      {
-                          std::ostringstream oss;
-                          // Ready queues
-
-                          for (int prio = 1; prio <= max_priority_sched; ++prio)
-                          {
-                              oss << "Priority: " << prio << " contains: ";
-                              for (size_t idx : readyQueue[prio].toVector())
-                              {
-                                  oss << "PID: " << process_pool[idx].getPid() << " ";
-                              }
-                              oss << "\n";
-                          }
-                          oss << "\n========================\n";
-                          // IO queue
-                          oss << "IO wait queue: ";
-
-                          for (size_t idx : IO_Processes->getQueue())
-                          {
-                              oss << "PID: " << process_pool[idx].getPid() << " ";
-                          }
-
-                          oss << "\n========================\n";
-                          oss << "IO wait queue size: " << IO_Processes->size();
-
-                          return oss.str();
-                      });
-
-                size_t i = readyQueue[el].pop();
-
-                PCB& p = process_pool[i];
-
-                //***** check if context switch *****//
-                if (lastProcess.has_value() && p.getPid() != lastProcess->getPid())
-                {
-                    currentTime += context_switch_time_sched;  // increment with context switch
-                }
-
-                //***** calculate time delta *****//
-                int delta = currentTime - lastTime;
-
-                //***** IO Wait Queue management *****//
-                // want to process IO first, for alredy waiting processes
-                if (delta > 0)
-                {
-                    IO_Processes->processIO(delta);
-
-                    // move finished IO processes
-                    const auto& finished = IO_Processes->getFinishedProcesses();
-                    for (size_t idx : finished)
-                    {
-                        PCB& proc = process_pool[idx];
-                        if (proc.getRemainingTime() > 0 && proc.isReady())
-                        {
-                            readyQueue[proc.getPriority()].push(idx);
-                        }
-                    }
-                    if (!finished.empty())
-                    {
-                        IO_Processes->clearFinished();
-                    }
-                }
-
-                //***** To track first response for processes *****//
-                if (!p.isFirstResponse())  // if its the process' first time about to execute, set
-                                           // these values.
-                {
-                    p.recordFirstResponse(currentTime);
-                }
-
-                //***** Execute process *****//
-                int timeElapsed = p.execute(time_quantum_sched);
-                currentTime += timeElapsed;
-                debug(EXEC,
-                      std::format("[EXEC] PID: {} ran for {} -> remaining time: {} at time {}",
-                                  p.getPid(),
-                                  timeElapsed,
-                                  p.getRemainingTime(),
-                                  currentTime));
-
-                //***** handle state transitions + Update IO Wait Queue *****//
-
-                if (p.isWaitingIO() && !IO_Processes->containsPID(p.getPid()))
-                {
-                    IO_Processes->enqueue(i);
-                    IO_Processes->updateIO();
-                }
-
-                if (p.isReady() && timeElapsed > 0)
-                    readyQueue[el].push(i);
-
-                if (p.getRemainingTime() <= 0)
-                {
-                    debug(EXEC, std::format("Process PID: {}, finished", p.getPid()));
-                    p.setCompletionTime(currentTime);
-                }
-
-                //***** Update aging *****//
-                updateQueuesAfterAging(&p, delta);
-
-                lastTime = currentTime;
-                lastProcess.emplace(p);
-                //***** Update logs *****//
-                logEvent(&p);
-                break;
-            }
+            continue;
         }
-    }
 
+        PCB& p = process_pool[next_idx.value()];
+        debug(EXTRA,
+              std::format("Selected process pid: {}, in state={}", p.getPid(), p.getStringState()));
+
+        //***** check if context switch *****//
+        if (lastProcess.has_value() && p.getPid() != lastProcess->getPid())
+        {
+            currentTime += context_switch_time_sched;  // increment with context switch
+        }
+
+        //***** calculate time delta *****//
+        int delta = currentTime - lastTime;
+
+        debug(EXTRA,
+              std::format("time calculation, current time={}, lasttime={}, delta={}",
+                          currentTime,
+                          lastTime,
+                          delta));
+
+        //***** IO Wait Queue management *****//
+        // want to process IO first, for alredy waiting processes
+        if (delta > 0)
+        {
+            processIOCompletions(delta);
+        }
+
+        //***** To track first response for processes *****//
+        if (!p.isFirstResponse())  // if its the process' first time about to execute, set
+                                   // these values.
+        {
+            p.recordFirstResponse(currentTime);
+        }
+
+        //***** Execute process *****//
+        debug(EXTRA,
+              std::format("PID: {}, ready={}, waitingIO={}, remainingtime={}, remainingIO={}\n",
+                          p.getPid(),
+                          p.isReady(),
+                          p.isWaitingIO(),
+                          p.getRemainingTime(),
+                          p.getIORemainingTime()));
+
+        int executeTime = strategy->getTimeSlice(p, time_quantum_sched);
+        int timeElapsed = p.execute(executeTime);
+        currentTime += timeElapsed;
+
+        debug(EXEC,
+              std::format("[EXEC] PID: {} ran for {} -> remaining time: {} at time {}",
+                          p.getPid(),
+                          timeElapsed,
+                          p.getRemainingTime(),
+                          currentTime));
+
+        //***** handle state transitions + Update IO Wait Queue *****//
+        debug(EXTRA,
+              [&]()
+              {
+                  std::ostringstream oss;
+                  oss << "IO SIZE: " << std::to_string(IO_Processes->size());
+                  for (auto& p : IO_Processes->getQueue())
+                  {
+                      oss << " pid: " << process_pool[p].getPid()
+                          << " state: " << process_pool[p].getStringState() << " ";
+                  }
+                  oss << "\n========================\nPrintQueue:\n";
+                  IO_Processes->printQueue();
+                  return oss.str();
+              });
+
+        handleProcessStateTransistion(p, next_idx.value());
+
+        if (p.isReady() && timeElapsed > 0)
+        {
+            int target_priority = strategy->getReinsertionPolicy(p);
+            readyQueue[target_priority].push(next_idx.value());
+        }
+
+        if (p.isFinished())
+        {
+            debug(EXEC, std::format("Process PID: {}, finished", p.getPid()));
+            p.setCompletionTime(currentTime);
+        }
+
+        //***** Update aging *****//
+        if (strategy->usesAging())
+        {
+            updateQueuesAfterAging(&p, delta);
+        }
+
+        lastTime = currentTime;
+        lastProcess.emplace(p);
+        //***** Update logs *****//
+        logEvent(&p);
+    }
     // when finished write all to logs.
     debug(EXEC, "Flushing logs");
     flushLogs();
@@ -387,20 +430,20 @@ void Scheduler::run()
         {
             case Process_STATE::READY:
                 debug(EXEC, "In Process_State ready");
-                priorityScheduling();
+                QueueSorting();
                 curr_state = Process_STATE::RUNNING;
                 break;
 
             case Process_STATE::RUNNING:
                 debug(EXEC, "In Process_State Running");
-                roundRobin();
+                runSchedulingLoop();
                 curr_state = Process_STATE::FINISHED;
                 break;
 
             case Process_STATE::FINISHED:
                 debug(EXEC, "In Process_State finished");
                 SystemMetrics sm{};
-                sm = metrics->calculate(currentTime);
+                sm = metrics->calculate(currentTime, algorithm_sched);
                 metrics->writeToFile(logs_name + "_metrics");
                 finished_flag = true;
                 break;

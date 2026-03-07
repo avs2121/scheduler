@@ -20,6 +20,7 @@ struct ProcessMetrics
 
 struct SystemMetrics
 {
+    std::string algorithm_used;
     double avg_turnaround_time;
     double avg_waiting_time;
     double avg_response_time;
@@ -36,7 +37,7 @@ class Metrics
     Metrics(std::vector<PCB>& process_pool);
 
     // calculate metrics from process pool
-    SystemMetrics calculate(int total_time);
+    SystemMetrics calculate(int total_time, std::string& algorithm);
 
     // to json format
     // write to file

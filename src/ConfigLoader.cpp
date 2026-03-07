@@ -6,6 +6,7 @@
 #include <iostream>
 #include <set>
 
+#include "Constants.h"
 #include "LogsJson.h"
 
 static std::filesystem::path LOG_DIR = "logs";
@@ -121,7 +122,21 @@ void ConfigLoader::validateSchedulerConfig()
     }
     else
     {
-        sched_conf.context_switch_time = DEFAULT_AGING_THRESHOLD;
+        sched_conf.context_switch_time = DEFAULT_CONTEXT_SWITCH_TIME;
+    }
+
+    if (sched.contains("algorithm"))
+    {
+        std::string val = sched["algorithm"].get<std::string>();
+        if (val.empty())
+        {
+            throw std::runtime_error("Error in algorithm in scheduler config");
+        }
+        sched_conf.algorithm = val;
+    }
+    else
+    {
+        sched_conf.algorithm = DEFAULT_ALGORITHM;
     }
 }
 

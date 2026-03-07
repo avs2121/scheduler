@@ -5,13 +5,13 @@
 #include <vector>
 
 #include "ConfigLoader.h"
+#include "Constants.h"
 #include "IOManager.h"
 #include "LogsJson.h"
 #include "Metrics.h"
 #include "PCB.h"
 #include "ReadyQueue.h"
-
-static constexpr int MAX_PROCESS_SIZE = 100;
+#include "StrategyFactory.h"
 
 class Scheduler
 {
@@ -27,6 +27,7 @@ class Scheduler
         IO = 1 << 2,       // 4
         QUEUE = 1 << 3,    // 8
         WARNING = 1 << 4,  // 16
+        EXTRA = 1 << 5,    // 32
         ALL = 0xFFFF
     };
 
@@ -37,29 +38,31 @@ class Scheduler
     bool isDebugEnabled(DebugLevel level) const;
     int getDebugLevel() const;
 
-    // Queue handler
-    void updateQueuesAfterAging(PCB* p, int& time_slice);
-
-    // Logging
-    void logEvent(PCB* p);
-    void flushLogs();
-
-    // Scheduling + Queues setup.
-    void priorityScheduling();
-    bool cleanUpQueues(int& currentTime, int& lastTime);
-    void roundRobin();
-
-    // load config
-    void loadConfig(std::string config_file);
-
     // Statemachine
     void run();
 
     ~Scheduler() = default;
 
    private:
-    // Helper functions to debug
+    // Logging
+    void logEvent(PCB* p);
+    void flushLogs();
 
+    // Scheduling + Queues setup.
+    void QueueSorting();
+    bool cleanUpQueues(int& currentTime, int& lastTime);
+    void runSchedulingLoop();
+
+    // load config
+    void loadConfig(std::string config_file);
+
+    // Queue handler
+    void PriorityQueueSetup();
+    void updateQueuesAfterAging(PCB* p, int& time_slice);
+    void processIOCompletions(int& delta);
+    void handleProcessStateTransistion(PCB& p, size_t idx);
+
+    // Helper functions to debug
     // Debug helper for lambdas
     template <typename Func>
     auto debug(DebugLevel category, Func&& func) const -> decltype(func(), void())
@@ -94,6 +97,8 @@ class Scheduler
     int currentTime;
     std::optional<PCB> lastProcess;
 
+    std::unique_ptr<SchedulerStrategy> strategy;
+
     std::vector<ReadyQueue<size_t, MAX_PROCESS_SIZE>> readyQueue;
     std::optional<IOManager> IO_Processes;  // for lazy/delayed initialization
     std::optional<Metrics> metrics;         // for lazy/delayed initialization
@@ -110,4 +115,5 @@ class Scheduler
     int aging_threshold_sched;
     int max_priority_sched;
     int context_switch_time_sched;
+    std::string algorithm_sched;
 };

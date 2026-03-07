@@ -3,6 +3,7 @@ CXXFLAGS = -g -std=c++20 -Wall -Iinclude
 
 SRC_PATH = src
 INC_PATH = include
+INC_PATH_STRATEGIES = $(INC_PATH)/strategies
 TEST_PATH = tests
 BUILD_DIR = build
 BIN_DIR = bin
@@ -10,14 +11,15 @@ LOG_DIR = logs
 BIN_PATH = $(BUILD_DIR)/$(BIN_DIR)
 
 #Source files
-SRC = $(SRC_PATH)/SchedulerClass.cpp $(SRC_PATH)/LogsJson.cpp $(SRC_PATH)/PCB.cpp $(SRC_PATH)/IOManager.cpp $(SRC_PATH)/Metrics.cpp $(SRC_PATH)/ConfigLoader.cpp
+SRC = $(SRC_PATH)/SchedulerClass.cpp $(SRC_PATH)/LogsJson.cpp $(SRC_PATH)/PCB.cpp $(SRC_PATH)/IOManager.cpp $(SRC_PATH)/Metrics.cpp $(SRC_PATH)/ConfigLoader.cpp $(SRC_PATH)/StrategyFactory.cpp
 MAIN_SRC = $(SRC_PATH)/PriorityScheduler.cpp
 
 #Test files
 TEST_SRC = $(TEST_PATH)/test_main.cpp $(TEST_PATH)/test_scheduler.cpp $(TEST_PATH)/test_pcb.cpp $(TEST_PATH)/test_io.cpp $(TEST_PATH)/test_configloader.cpp $(TEST_PATH)/TestFixture.cpp
 
 #Include files
-INC = $(INC_PATH)/ReadyQueue.h $(INC_PATH)/SchedulerClass.h $(INC_PATH)/PCB.h $(INC_PATH)/IOManager.h $(INC_PATH)/Metrics.h $(INC_PATH)/ConfigLoader.h
+INC = $(INC_PATH)/Constants.h $(INC_PATH)/ReadyQueue.h $(INC_PATH)/SchedulerClass.h $(INC_PATH)/PCB.h $(INC_PATH)/IOManager.h $(INC_PATH)/Metrics.h $(INC_PATH)/ConfigLoader.h $(INC_PATH)/SchedulerStrategy.h $(INC_PATH_STRATEGIES)/PriorityRoundRobin.h $(INC_PATH_STRATEGIES)/ShortestJobFirst.h $(INC_PATH_STRATEGIES)/FirstComeFirstServed.h $(INC_PATH)/StrategyFactory.h
+
 TEST_INC = $(TEST_PATH)/TestFixture.h
 
 #Targets
