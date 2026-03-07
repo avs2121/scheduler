@@ -2,9 +2,9 @@
 
 #include <string.h>
 
-#include "FirstComeFirstServed.h"
-#include "PriorityRoundRobin.h"
-#include "ShortestJobFirst.h"
+#include "strategies\FirstComeFirstServed.h"
+#include "strategies\PriorityRoundRobin.h"
+#include "strategies\ShortestJobFirst.h"
 
 std::unique_ptr<SchedulerStrategy> StrategyFactory::createStrategy(const std::string& algo_name)
 {
