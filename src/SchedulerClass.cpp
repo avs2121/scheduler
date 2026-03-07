@@ -258,41 +258,14 @@ void Scheduler::runSchedulingLoop()
         {
             if (!readyQueue[el].empty())
             {
-                debug(QUEUE,
-                      [&]()
-                      {
-                          std::ostringstream oss;
-                          // Ready queues
+                auto i = strategy->selectNext(readyQueue, process_pool, currentTime);
 
-                          for (int prio = 1; prio <= max_priority_sched; ++prio)
-                          {
-                              oss << "Priority: " << prio << " contains: ";
-                              for (size_t idx : readyQueue[prio].toVector())
-                              {
-                                  oss << "PID: " << process_pool[idx].getPid() << " ";
-                              }
-                              oss << "\n";
-                          }
-                          oss << "\n========================\n";
-                          // IO queue
-                          oss << "IO wait queue: ";
+                if (!i.has_value())
+                {
+                    continue;
+                }
 
-                          for (size_t idx : IO_Processes->getQueue())
-                          {
-                              oss << "PID: " << process_pool[idx].getPid() << " ";
-                          }
-
-                          oss << "\n========================\n";
-                          oss << "IO wait queue size: " << IO_Processes->size();
-                          oss << "\n========================\n";
-
-                          return oss.str();
-                      });
-
-                size_t i = readyQueue[el].pop();
-
-                PCB& p = process_pool[i];
-
+                PCB& p = process_pool[i.value()];
                 debug(EXTRA,
                       std::format("Selected process pid: {}, in state={}",
                                   p.getPid(),
@@ -373,10 +346,10 @@ void Scheduler::runSchedulingLoop()
                       [&]()
                       {
                           std::ostringstream oss;
-                          oss << "IO SIZE:" << std::to_string(IO_Processes->size());
+                          oss << "IO SIZE: " << std::to_string(IO_Processes->size());
                           for (auto& p : IO_Processes->getQueue())
                           {
-                              oss << "pid: " << process_pool[p].getPid()
+                              oss << " pid: " << process_pool[p].getPid()
                                   << " state: " << process_pool[p].getStringState() << " ";
                           }
                           oss << "\n========================\nPrintQueue:\n";
@@ -386,13 +359,13 @@ void Scheduler::runSchedulingLoop()
 
                 if (p.isWaitingIO() && !IO_Processes->containsPID(p.getPid()))
                 {
-                    IO_Processes->enqueue(i);
+                    IO_Processes->enqueue(i.value());
                     IO_Processes->updateIO();
                 }
 
                 if (p.isReady() && timeElapsed > 0)
                 {
-                    readyQueue[p.getPriority()].push(i);
+                    readyQueue[p.getPriority()].push(i.value());
                 }
 
                 if (p.getRemainingTime() <= 0)
@@ -412,7 +385,6 @@ void Scheduler::runSchedulingLoop()
             }
         }
     }
-
     // when finished write all to logs.
     debug(EXEC, "Flushing logs");
     flushLogs();
@@ -448,7 +420,7 @@ void Scheduler::run()
             case Process_STATE::FINISHED:
                 debug(EXEC, "In Process_State finished");
                 SystemMetrics sm{};
-                sm = metrics->calculate(currentTime);
+                sm = metrics->calculate(currentTime, algorithm_sched);
                 metrics->writeToFile(logs_name + "_metrics");
                 finished_flag = true;
                 break;

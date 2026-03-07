@@ -16,7 +16,8 @@ class FirstComeFirstServed : public SchedulerStrategy
         {
             if (!queues.empty())
             {
-                std::cout << "Choose from FCFS: " << queues[prio].front() << std::endl;
+                std::cout << "Choose from FCFS: " << queues[process_pool[prio].getPid()].front()
+                          << std::endl;
                 idx = queues[prio].front();
                 found = true;
             }

@@ -16,12 +16,11 @@ class ShortestJobFirst : public SchedulerStrategy
         int shortest_time = INT_MAX;
         bool found = false;
 
-        for (int prio = 1; prio <= queues.size() - 1; ++prio)
+        for (auto prio = 1; prio <= queues.size() - 1; ++prio)
         {
             if (!queues[prio].empty())
             {
                 size_t temp_idx = queues[prio].front();
-                std::cout << "Choose from FCFS: " << queues[prio].front() << std::endl;
 
                 if (process_pool[temp_idx].getRemainingTime() < shortest_time)
                 {
@@ -30,15 +29,18 @@ class ShortestJobFirst : public SchedulerStrategy
                     found = true;
                 }
             }
-            if (found)
+        }
+        std::cout << "Choose PID from SJF: " << queues[process_pool[shortest_idx].getPid()]
+                  << std::endl;
+
+        if (found)
+        {
+            for (auto& q : queues)
             {
-                for (auto& q : queues)
-                {
-                    if (q.remove(shortest_idx))
-                        break;
-                }
-                return shortest_idx;
+                if (q.remove(shortest_idx))
+                    break;
             }
+            return shortest_idx;
         }
         return std::nullopt;  // absence of value -> no process to pop
     }

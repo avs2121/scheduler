@@ -8,11 +8,10 @@ class PriorityRoundRobin : public SchedulerStrategy
                                      const std::vector<PCB>& process_pool,
                                      int currentTime) override
     {
-        for (int prio = 1; prio <= queues.size() - 1; ++prio)
+        for (auto prio = 1; prio <= queues.size() - 1; ++prio)
         {
             if (!queues[prio].empty())
             {
-                std::cout << "Choose from RR: " << queues[prio].front() << std::endl;
                 return queues[prio].pop();
             }
         }

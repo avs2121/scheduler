@@ -7,13 +7,14 @@ Metrics::Metrics(std::vector<PCB>& process_pool)
 {
 }
 
-SystemMetrics Metrics::calculate(int total_time)
+SystemMetrics Metrics::calculate(int total_time, std::string& algorithm)
 {
     SystemMetrics metrics;
     // for each process loop through and get the needed characteristics for the
     // system metrics. add that to the 'metrics' and return that when finished.
     // set cached_metrics to the metrics before returning the metrics.
 
+    metrics.algorithm_used = algorithm;
     metrics.total_time = total_time;
     metrics.total_processes = process_pool.size();
 
@@ -80,7 +81,8 @@ json Metrics::toJson() const
     }
 
     json summary;
-    summary["system_metrics"] = {{"Average turnaround time", cached_metrics.avg_turnaround_time},
+    summary["system_metrics"] = {{"Algorithm used", cached_metrics.algorithm_used},
+                                 {"Average turnaround time", cached_metrics.avg_turnaround_time},
                                  {"Average waiting time", cached_metrics.avg_waiting_time},
                                  {"Average response time", cached_metrics.avg_response_time},
                                  {"CPU Utilization", cached_metrics.cpu_utilization},
