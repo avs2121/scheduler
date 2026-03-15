@@ -387,7 +387,7 @@ void Scheduler::runSchedulingLoop()
 
         if (p.isReady() && timeElapsed > 0)
         {
-            int target_priority = strategy->getReinsertionPolicy(p);
+            int target_priority = strategy->getReinsertionPolicy(p, timeElapsed);
             readyQueue[target_priority].push(next_idx.value());
         }
 

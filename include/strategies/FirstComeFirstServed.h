@@ -48,7 +48,7 @@ class FirstComeFirstServed : public SchedulerStrategy
     }
 
     // only has one priority level (1)
-    int getReinsertionPolicy(const PCB& process) const override
+    int getReinsertionPolicy(const PCB& process, int time_elapsed) const override
     {
         return 1;
     }

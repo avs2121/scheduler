@@ -31,7 +31,7 @@ class PriorityRoundRobin : public SchedulerStrategy
     }
 
     // rr reinsert at priority level
-    int getReinsertionPolicy(const PCB& process) const override
+    int getReinsertionPolicy(const PCB& process, int time_elapsed) const override
     {
         return process.getPriority();
     }

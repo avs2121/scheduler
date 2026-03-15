@@ -24,7 +24,7 @@ class SchedulerStrategy
     virtual bool shouldPreempt(const PCB& current_process, const PCB& new_process) const = 0;
 
     // called after process finish quantum to determine where it goes (priority level)
-    virtual int getReinsertionPolicy(const PCB& process) const = 0;
+    virtual int getReinsertionPolicy(const PCB& process, int time_elapsed) const = 0;
 
     virtual bool usesPriorityQueues() const = 0;
 
