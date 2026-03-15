@@ -59,7 +59,7 @@ class MultiLevelFeedbackQueue : public SchedulerStrategy
     // only preempt if the new process is of higher priority
     bool shouldPreempt(const PCB& current_process, const PCB& new_process) const override
     {
-        return current_process.getPriority() < new_process.getPriority();
+        return current_process.getPriority() > new_process.getPriority();
     }
 
     // rr reinsert at priority level
@@ -67,10 +67,11 @@ class MultiLevelFeedbackQueue : public SchedulerStrategy
     {
         if (time_elapsed == time_quantums[process.getPriority()])
         {
-            if (process.getPriority() !=
-                time_quantums.size())  // check it is not in the lowest priority queue
+            if (process.getPriority() <
+                time_quantums.size() - 1)  // check it is not in the lowest priority queue
             {
-                return process.getPriority() + 1;
+                // process.setPriority(process.getPriority() + 1);
+                return process.getPriority() + 1;  // demote the process
             }
             else
             {

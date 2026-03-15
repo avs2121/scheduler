@@ -4,7 +4,7 @@
         "aging_threshold": 5,
         "max_priority": 3,
         "context_switch_time": 1,
-        "algorithm": "rr"
+        "algorithm": "mlfq"
     },
     "processes": [
         {

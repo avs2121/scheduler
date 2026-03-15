@@ -21,7 +21,7 @@ void Scheduler::loadConfig(std::string config_file)
     context_switch_time_sched = sched_conf.context_switch_time;
     algorithm_sched = sched_conf.algorithm;
 
-    strategy = StrategyFactory::createStrategy(algorithm_sched);
+    strategy = StrategyFactory::createStrategy_map(algorithm_sched);
 
     readyQueue.resize(max_priority_sched +
                       1);  // after getting the max_priority value, resize the container.
@@ -388,6 +388,7 @@ void Scheduler::runSchedulingLoop()
         if (p.isReady() && timeElapsed > 0)
         {
             int target_priority = strategy->getReinsertionPolicy(p, timeElapsed);
+            p.setPriority(target_priority);
             readyQueue[target_priority].push(next_idx.value());
         }
 

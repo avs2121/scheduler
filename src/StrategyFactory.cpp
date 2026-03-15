@@ -2,17 +2,6 @@
 
 #include <algorithm>
 
-#include "strategies/FirstComeFirstServed.h"
-#include "strategies/MultiLevelFeedbackQueue.h"
-#include "strategies/PriorityRoundRobin.h"
-#include "strategies/ShortestJobFirst.h"
-
-const std::unordered_map<std::string, std::function<std::unique_ptr<SchedulerStrategy>()>>
-    strategy_map = {{"rr", []() { return std::make_unique<PriorityRoundRobin>(); }},
-                    {"fcfs", []() { return std::make_unique<FirstComeFirstServed>(); }},
-                    {"sjf", []() { return std::make_unique<ShortestJobFirst>(); }},
-                    {"mlfq", []() { return std::make_unique<MultiLevelFeedbackQueue>(); }}};
-
 std::unique_ptr<SchedulerStrategy> StrategyFactory::createStrategy_map(std::string& algo_name)
 {
     // transforming to lower-case letters to adhere to lambda function calls for each strategy
