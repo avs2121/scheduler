@@ -30,8 +30,6 @@ class ShortestJobFirst : public SchedulerStrategy
                 }
             }
         }
-        std::cout << "Choose PID from SJF: " << queues[process_pool[shortest_idx].getPid()]
-                  << std::endl;
 
         if (found)
         {

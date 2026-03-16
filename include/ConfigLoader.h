@@ -29,6 +29,7 @@ struct ProcessConfig
     int burst;
     bool io_bound;
     int io_interval;
+    int arrival_time;
 };
 
 class ConfigLoader

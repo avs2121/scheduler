@@ -7,9 +7,15 @@ PCB::PCB(int pid,
          int burst,
          bool io_bound,
          int io_interval,
+         int arrival,
          int aging_threshold,
          int time_quantum)
-    : pid(pid), prio(prio), burst_time(burst), io_bound(io_bound), io_interval(io_interval)
+    : pid(pid),
+      prio(prio),
+      burst_time(burst),
+      io_bound(io_bound),
+      io_interval(io_interval),
+      arrival_time(arrival)
 {
     this->old_prio = prio;
     this->remaining_time = burst;
@@ -157,6 +163,11 @@ int PCB::getFirstResponseTime() const
     return first_response_time;
 }
 
+int PCB::getArrivalTime() const
+{
+    return arrival_time;
+}
+
 ProcessState PCB::getState() const
 {
     return PS;
@@ -182,6 +193,11 @@ std::string PCB::getStringState() const
             return "UNKNOWN";
             break;
     }
+}
+
+bool PCB::hasArrived(int current_time) const
+{
+    return arrival_time <= current_time;
 }
 
 bool PCB::isIOBound() const

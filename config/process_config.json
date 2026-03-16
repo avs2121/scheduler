@@ -4,7 +4,7 @@
         "aging_threshold": 5,
         "max_priority": 3,
         "context_switch_time": 1,
-        "algorithm": "mlfq"
+        "algorithm": "rr"
     },
     "processes": [
         {
@@ -12,21 +12,24 @@
             "priority": 2,
             "burst_time": 10,
             "io_bound": true,
-            "io_interval": 5
+            "io_interval": 5,
+            "arrival_time": 2
         },
         {
             "pid": 2,
             "priority": 3,
             "burst_time": 8,
             "io_bound": false,
-            "io_interval": 0
+            "io_interval": 0,
+            "arrival_time": 10
         },
         {
             "pid": 3,
             "priority": 1,
             "burst_time": 22,
             "io_bound": true,
-            "io_interval": 9
+            "io_interval": 9,
+            "arrival_time": 0
         }
     ]
 }

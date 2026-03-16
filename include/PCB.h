@@ -19,6 +19,7 @@ class PCB
         int burst,
         bool io_bound,
         int io_interval,
+        int arrival_time,
         int aging_threshold,
         int time_quantum);
 
@@ -41,6 +42,8 @@ class PCB
     int getTotalIOTime() const;
     int getTotalCpuUsedTime() const;
     int getFirstResponseTime() const;
+    int getArrivalTime() const;
+    bool hasArrived(int current_time) const;
     bool isIOBound() const;
     bool isFirstResponse() const;
 
@@ -79,6 +82,7 @@ class PCB
     int total_io_time;        // total time spent in i/o wait. Updates in IOManager
     int first_response_time;  // note the time of the first response for process.
     bool first_response;      // set this, for first execute cycle on the process
+    int arrival_time;         // set when a process should arrive
     ProcessState PS;          // Process State
 
     // scheduler config

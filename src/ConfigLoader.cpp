@@ -42,6 +42,7 @@ std::vector<ProcessConfig> ConfigLoader::getProcessConfig() const
         proc.burst = i["burst_time"];
         proc.io_bound = i["io_bound"];
         proc.io_interval = i["io_interval"];
+        proc.arrival_time = i["arrival_time"];
         vector_conf.push_back(proc);
     }
 

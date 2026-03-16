@@ -43,6 +43,7 @@ void Scheduler::loadConfig(std::string config_file)
                                   pc.burst,
                                   pc.io_bound,
                                   pc.io_interval,
+                                  pc.arrival_time,
                                   aging_threshold_sched,
                                   time_quantum_sched);
     }
@@ -71,10 +72,11 @@ void Scheduler::QueueSorting()
     for (const auto& proc : process_pool)
     {
         debug(EXEC,
-              std::format("PID: {}, Burst Time: {}, Priority: {}",
+              std::format("PID: {}, Burst Time: {}, Priority: {}, Arrival Time: {}",
                           proc.getPid(),
                           proc.getBurstTime(),
-                          proc.getPriority()));
+                          proc.getPriority(),
+                          proc.getArrivalTime()));
     }
     debug(EXEC,
           std::format("Time Quantum: {}, Max Priority: {}, Aging Threshold: {}, Context Switch "
@@ -295,6 +297,12 @@ void Scheduler::runSchedulingLoop()
     {
         PriorityQueueSetup();
     }
+
+    // for prio queue (and non-prio queue), make initial setup with processes with arrival time = 0
+    // -> This is in setup
+
+    // secondly then for every time quantum iteration make a check for new arriving processes
+    // -> This is part of schedule loop
 
     currentTime = 0;  // track current time
     int lastTime = 0;
