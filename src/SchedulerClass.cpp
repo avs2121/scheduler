@@ -276,27 +276,46 @@ void Scheduler::handleProcessStateTransistion(PCB& p, size_t idx)
     }
 }
 
-void Scheduler::PriorityQueueSetup()
+int Scheduler::getTargetQueues(PCB& proc)
 {
-    for (size_t p = 0; p < process_pool.size(); p++)
+    if (strategy->usesPriorityQueues())
     {
-        if (process_pool[p].getPriority() < 0 ||
-            process_pool[p].getPriority() > max_priority_sched)  // use clamp!
+        auto prio = proc.getPriority();
+        if (prio < 0 || prio > max_priority_sched)  // use clamp!
         {
-            process_pool[p].setPriority(
-                std::clamp(process_pool[p].getPriority(), 1, max_priority_sched));
+            prio = std::clamp(proc.getPriority(), 1, max_priority_sched);
+            proc.setPriority(prio);
             debug(WARNING, "Clamping prio - otherwise out of index");
         }
-        readyQueue[process_pool[p].getPriority()].push(p);
+
+        // priority queues use multiple level queues
+        return prio;
+    }
+    else
+    {
+        // Non-priority queues use a single level 1 queue
+        return 1;
+    }
+}
+
+void Scheduler::PopulateInitialQueues()
+{
+    for (size_t idx = 0; idx < process_pool.size(); idx++)
+    {
+        PCB& proc = process_pool[idx];
+        if (proc.getArrivalTime() > 0)
+        {
+            continue;  // skip processes that arrive later
+        }
+        int target_prio = getTargetQueues(proc);
+        readyQueue[target_prio].push(idx);
     }
 }
 
 void Scheduler::runSchedulingLoop()
 {
-    if (strategy->usesPriorityQueues())
-    {
-        PriorityQueueSetup();
-    }
+    // setup queue (either priority or non-priority)
+    PopulateInitialQueues();
 
     // for prio queue (and non-prio queue), make initial setup with processes with arrival time = 0
     // -> This is in setup

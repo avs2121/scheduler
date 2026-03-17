@@ -9,27 +9,11 @@ class FirstComeFirstServed : public SchedulerStrategy
                                      int currentTime) override
     {
         // Store the first arrived process in the highest priority
-        // maybe just take queues[0] ?
-        size_t idx{0};
-        bool found = false;
-        for (auto prio = 1; prio <= queues.size() - 1; ++prio)
+        // maybe just take queues[1] ?
+        if (!queues[1].empty())
         {
-            if (!queues[prio].empty())
-            {
-                idx = queues[prio].front();
-                found = true;
-            }
-            if (found)
-            {
-                for (auto& q : queues)
-                {
-                    q.remove(idx);
-                    break;
-                }
-                return idx;
-            }
+            return queues[1].pop();
         }
-
         return std::nullopt;
     }
 

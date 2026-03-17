@@ -57,7 +57,11 @@ class Scheduler
     void loadConfig(std::string config_file);
 
     // Queue handler
-    void PriorityQueueSetup();
+    void PopulateInitialQueues();  // Queue initialization
+    int getTargetQueues(PCB& proc);
+    void loadArrivingProcesses(int currentTime);  // dynamic arrivals
+    void initializeUnscheduled();                 // keep unscheduled processes structured
+
     void updateQueuesAfterAging(PCB* p, int& time_slice);
     void processIOCompletions(int& delta);
     void handleProcessStateTransistion(PCB& p, size_t idx);
@@ -90,6 +94,9 @@ class Scheduler
     PCB& getProcessByPID(int pid);
     size_t pidToIndex(int pid) const;
     int indexToPid(size_t idx) const;
+
+    // hold the unscheduled processes
+    std::vector<size_t> unscheduled_processes;
 
     // hold the loaded processes
     std::vector<PCB> process_pool;
