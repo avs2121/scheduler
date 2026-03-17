@@ -276,6 +276,24 @@ void Scheduler::handleProcessStateTransistion(PCB& p, size_t idx)
     }
 }
 
+void Scheduler::initializeUnscheduled()
+{
+    // iterate through all processes
+    //  every process with later arrival time add to unscheduled processes
+    //  sort the processes
+    for (size_t idx = 0; idx < process_pool.size(); idx++)
+    {
+        if (process_pool[idx].getArrivalTime() > 0)
+        {
+            unscheduled_processes.push_back(idx);
+        }
+    }
+    // sort by arriving time
+    std::ranges::sort(unscheduled_processes,
+                      std::ranges::less{},
+                      [this](size_t idx) { return process_pool[idx].getArrivalTime(); });
+}
+
 int Scheduler::getTargetQueues(PCB& proc)
 {
     if (strategy->usesPriorityQueues())
@@ -310,6 +328,18 @@ void Scheduler::PopulateInitialQueues()
         int target_prio = getTargetQueues(proc);
         readyQueue[target_prio].push(idx);
     }
+}
+
+void Scheduler::loadArrivingProcesses(int currentTime)
+{
+    /*
+        check if unscheduled process arent empty
+        take the front element for unscheduled processes
+        take the pcb via the index
+        check if the arrival time is passed
+        add to ready queue
+        erase from unscheduled processes
+    */
 }
 
 void Scheduler::runSchedulingLoop()
